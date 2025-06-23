@@ -13,44 +13,32 @@
 <body>
   <h1>Patek Philippe Reference Lookup</h1>
   <p>Enter a reference number below and click Lookup:</p>
-  <input id="reference" type="text" placeholder="e.g. 5167R" />
+  <input id="reference" type="text" placeholder="e.g. 5167A-012" />
   <button onclick="lookupReference()">Lookup</button>
   <div id="result"></div>
 
   <script>
-    const collections = {
-      '51': 'Nautilus / Aquanaut',
-      '52': 'Calatrava',
-      '57': 'Nautilus Complications',
-      '59': 'Grand Complication',
-      '50': 'Golden Ellipse'
-    };
-
-    const materials = {
-      'A': 'Stainless Steel',
-      'R': 'Rose Gold',
-      'J': 'Yellow Gold',
-      'G': 'White Gold',
-      'P': 'Platinum'
-    };
-
     function lookupReference() {
       const refInput = document.getElementById('reference').value.trim().toUpperCase();
       if (!refInput) {
         alert('Please enter a reference number.');
         return;
       }
-      const prefix = refInput.slice(0, 2);
-      const modelVariant = refInput.slice(2, -1);
-      const suffix = /[A-Z]$/.test(refInput) ? refInput.slice(-1) : null;
 
-      const collection = collections[prefix] || 'Unknown Collection';
-      const material = suffix ? (materials[suffix] || 'Unknown Material') : 'No suffix (likely steel or specified otherwise)';
+      let resultHTML = '';
 
-      const resultHTML = `<strong>Reference:</strong> ${refInput}<br>
-        <strong>Collection:</strong> ${collection}<br>
-        <strong>Model/Variant:</strong> ${modelVariant}<br>
-        <strong>Material:</strong> ${material}`;
+      if (refInput === '5167A-012') {
+        resultHTML = `
+          ✅ <strong>Collection:</strong> Aquanaut<br>
+          ✅ <strong>Case:</strong> Stainless Steel, 40mm<br>
+          ✅ <strong>Dial:</strong> Black embossed dial<br>
+          ✅ <strong>Strap:</strong> Bright red “tropical” rubber strap (very sporty, limited availability)<br>
+          ✅ <strong>Movement:</strong> Caliber 324 S C (time + date, automatic)<br>
+          ✅ <strong>Water Resistance:</strong> 120m
+        `;
+      } else {
+        resultHTML = `Reference ${refInput} is not in the database yet.`;
+      }
 
       document.getElementById('result').innerHTML = resultHTML;
     }
