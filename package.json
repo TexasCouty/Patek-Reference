@@ -16,8 +16,5 @@
   "bugs": {
     "url": "https://github.com/TexasCouty/Fine-Watches/issues"
   },
-  "homepage": "https://github.com/TexasCouty/Fine-Watches#readme",
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  }
+  "homepage": "https://github.com/TexasCouty/Fine-Watches#readme"
 }
