@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patek Philippe Reference Lookup</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    input, button { font-size: 1rem; padding: 10px; margin: 5px 0; width: 100%; }
+    #result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Patek Philippe Reference Lookup</h1>
+  <input id="reference" type="text" placeholder="Enter reference, e.g. 5167R" />
+  <button onclick="lookupReference()">Lookup</button>
+  <div id="result"></div>
+
+  <script>
+    const collections = {
+      '51': 'Nautilus / Aquanaut',
+      '52': 'Calatrava',
+      '57': 'Nautilus Complications',
+      '59': 'Grand Complication',
+      '50': 'Golden Ellipse'
+    };
+
+    const materials = {
+      'A': 'Stainless Steel',
+      'R': 'Rose Gold',
+      'J': 'Yellow Gold',
+      'G': 'White Gold',
+      'P': 'Platinum'
+    };
+
+    function lookupReference() {
+      const refInput = document.getElementById('reference').value.trim().toUpperCase();
+      const prefix = refInput.slice(0, 2);
+      const modelVariant = refInput.slice(2, -1);
+      const suffix = /[A-Z]$/.test(refInput) ? refInput.slice(-1) : null;
+
+      const collection = collections[prefix] || 'Unknown Collection';
+      const material = suffix ? (materials[suffix] || 'Unknown Material') : 'No suffix (likely steel or specified otherwise)';
+
+      const resultHTML = `<strong>Reference:</strong> ${refInput}<br>
+        <strong>Collection:</strong> ${collection}<br>
+        <strong>Model/Variant:</strong> ${modelVariant}<br>
+        <strong>Material:</strong> ${material}`;
+
+      document.getElementById('result').innerHTML = resultHTML;
+    }
+  </script>
+</body>
+</html>
