@@ -1,4 +1,3 @@
-// ✅ No need for 'node-fetch' — uses built-in fetch
 exports.handler = async function (event) {
   try {
     const { reference } = JSON.parse(event.body);
@@ -11,7 +10,7 @@ exports.handler = async function (event) {
 ✅ Movement
 ✅ Water Resistance`;
 
-    // ✅ Uses native fetch
+    // ✅ Use native fetch
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -26,7 +25,20 @@ exports.handler = async function (event) {
 
     const data = await response.json();
 
-    // ✅ Always return an object with 'reply'
+    // ✅ Log entire response for debugging
+    console.log('OpenAI response:', JSON.stringify(data, null, 2));
+
+    if (!data.choices || !data.choices[0]) {
+      // Return error if response is unexpected
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          reply: `OpenAI error: ${JSON.stringify(data)}`
+        })
+      };
+    }
+
+    // ✅ Safe return
     return {
       statusCode: 200,
       body: JSON.stringify({
