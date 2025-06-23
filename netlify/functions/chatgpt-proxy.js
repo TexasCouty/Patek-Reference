@@ -5,7 +5,7 @@ exports.handler = async function (event) {
 
     const { reference } = JSON.parse(event.body);
 
-    const prompt = `Give a detailed breakdown for the Patek Philippe reference ${reference}. Include:
+    const prompt = `Give a brief breakdown for the Patek Philippe reference ${reference}. Include:
 ✅ Collection
 ✅ Case
 ✅ Dial
@@ -20,7 +20,7 @@ exports.handler = async function (event) {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o",
         messages: [{ role: 'user', content: prompt }]
       })
     });
