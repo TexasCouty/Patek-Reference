@@ -1,26 +1,63 @@
-<script>
-  async function lookupReference() {
-    const refInput = document.getElementById('reference').value.trim();
-    if (!refInput) {
-      alert('Please enter a reference number.');
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patek Philippe Reference Lookup (Secure)</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 20px; 
+      max-width: 500px; 
+      margin: auto; 
     }
-
-    document.getElementById('result').innerText = 'Fetching info...';
-
-    try {
-      // ✅ This calls your secure serverless function instead of OpenAI directly
-      const response = await fetch('/.netlify/functions/chatgpt-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reference: refInput })
-      });
-
-      const data = await response.json();
-      document.getElementById('result').innerText = data.reply;
-    } catch (error) {
-      console.error(error);
-      document.getElementById('result').innerText = 'Error fetching data.';
+    input, button { 
+      font-size: 1rem; 
+      padding: 10px; 
+      margin: 5px 0; 
+      width: 100%; 
     }
-  }
-</script>
+    #result { 
+      margin-top: 20px; 
+      padding: 15px; 
+      border: 1px solid #ccc; 
+      border-radius: 5px; 
+      white-space: pre-wrap; 
+    }
+  </style>
+</head>
+<body>
+  <h1>Patek Philippe Reference Lookup</h1>
+  <p>Enter a reference number below and click Lookup:</p>
+  <input id="reference" type="text" placeholder="e.g. 5167A-012" />
+  <button onclick="lookupReference()">Lookup</button>
+  <div id="result"></div>
+
+  <script>
+    async function lookupReference() {
+      const refInput = document.getElementById('reference').value.trim();
+      if (!refInput) {
+        alert('Please enter a reference number.');
+        return;
+      }
+
+      document.getElementById('result').innerText = 'Fetching info...';
+
+      try {
+        // ✅ For Netlify: calls your serverless function in netlify/functions/
+        const response = await fetch('/.netlify/functions/chatgpt-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reference: refInput })
+        });
+
+        const data = await response.json();
+        document.getElementById('result').innerText = data.reply;
+      } catch (error) {
+        console.error(error);
+        document.getElementById('result').innerText = 'Error fetching data. Check function logs and API key.';
+      }
+    }
+  </script>
+</body>
+</html>
