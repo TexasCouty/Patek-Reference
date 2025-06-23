@@ -2,45 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Patek Philippe Reference Lookup</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
     input, button { font-size: 1rem; padding: 10px; margin: 5px 0; width: 100%; }
-    #result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+    #result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
-  <h1>Patek Philippe Reference Lookup</h1>
+  <h1>Patek Philippe Reference Lookup (ChatGPT Powered)</h1>
   <p>Enter a reference number below and click Lookup:</p>
   <input id="reference" type="text" placeholder="e.g. 5167A-012" />
   <button onclick="lookupReference()">Lookup</button>
   <div id="result"></div>
 
   <script>
-    function lookupReference() {
-      const refInput = document.getElementById('reference').value.trim().toUpperCase();
+    const OPENAI_API_KEY = "Put Key ehre" // 🔑 Replace with your real key
+
+    async function lookupReference() {
+      const refInput = document.getElementById('reference').value.trim();
       if (!refInput) {
         alert('Please enter a reference number.');
         return;
       }
 
-      let resultHTML = '';
+      document.getElementById('result').innerText = 'Fetching info from ChatGPT...';
 
-      if (refInput === '5167A-012') {
-        resultHTML = `
-          ✅ <strong>Collection:</strong> Aquanaut<br>
-          ✅ <strong>Case:</strong> Stainless Steel, 40mm<br>
-          ✅ <strong>Dial:</strong> Black embossed dial<br>
-          ✅ <strong>Strap:</strong> Bright red “tropical” rubber strap (very sporty, limited availability)<br>
-          ✅ <strong>Movement:</strong> Caliber 324 S C (time + date, automatic)<br>
-          ✅ <strong>Water Resistance:</strong> 120m
-        `;
-      } else {
-        resultHTML = `Reference ${refInput} is not in the database yet.`;
+      const prompt = `Give a detailed breakdown for the Patek Philippe reference ${refInput}. Include: 
+✅ Collection 
+✅ Case 
+✅ Dial 
+✅ Strap 
+✅ Movement 
+✅ Water Resistance`;
+
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o",
+            messages: [{ role: "user", content: prompt }]
+          })
+        });
+
+        const data = await response.json();
+        const reply = data.choices[0].message.content;
+
+        document.getElementById('result').innerText = reply;
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById('result').innerText = 'Error fetching data. Check your API key or network.';
       }
-
-      document.getElementById('result').innerHTML = resultHTML;
     }
   </script>
 </body>
