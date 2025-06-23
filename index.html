@@ -3,41 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Patek Philippe Reference Lookup (Secure)</title>
+  <title>Patek Philippe Reference Lookup (ChatGPT Powered)</title>
   <style>
-<<<<<<< HEAD
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
-    input, button { font-size: 1rem; padding: 10px; margin: 5px 0; width: 100%; }
-    #result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; white-space: pre-wrap; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+    input, button {
+      font-size: 1rem;
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h1>Patek Philippe Reference Lookup (ChatGPT Powered)</h1>
-=======
-    body { 
-      font-family: Arial, sans-serif; 
-      padding: 20px; 
-      max-width: 500px; 
-      margin: auto; 
-    }
-    input, button { 
-      font-size: 1rem; 
-      padding: 10px; 
-      margin: 5px 0; 
-      width: 100%; 
-    }
-    #result { 
-      margin-top: 20px; 
-      padding: 15px; 
-      border: 1px solid #ccc; 
-      border-radius: 5px; 
-      white-space: pre-wrap; 
-    }
-  </style>
-</head>
-<body>
-  <h1>Patek Philippe Reference Lookup</h1>
->>>>>>> 77bf04765764b9d19e9568bc042b3b06d3aa63b9
   <p>Enter a reference number below and click Lookup:</p>
   <input id="reference" type="text" placeholder="e.g. 5167A-012" />
   <button onclick="lookupReference()">Lookup</button>
@@ -54,10 +44,7 @@
       document.getElementById('result').innerText = 'Fetching info...';
 
       try {
-<<<<<<< HEAD
-=======
-        // ✅ For Netlify: calls your serverless function in netlify/functions/
->>>>>>> 77bf04765764b9d19e9568bc042b3b06d3aa63b9
+        // ✅ Calls your Netlify Function
         const response = await fetch('/.netlify/functions/chatgpt-proxy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -68,11 +55,7 @@
         document.getElementById('result').innerText = data.reply;
       } catch (error) {
         console.error(error);
-<<<<<<< HEAD
         document.getElementById('result').innerText = 'Error fetching data.';
-=======
-        document.getElementById('result').innerText = 'Error fetching data. Check function logs and API key.';
->>>>>>> 77bf04765764b9d19e9568bc042b3b06d3aa63b9
       }
     }
   </script>
