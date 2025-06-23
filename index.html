@@ -12,7 +12,8 @@
 </head>
 <body>
   <h1>Patek Philippe Reference Lookup</h1>
-  <input id="reference" type="text" placeholder="Enter reference, e.g. 5167R" />
+  <p>Enter a reference number below and click Lookup:</p>
+  <input id="reference" type="text" placeholder="e.g. 5167R" />
   <button onclick="lookupReference()">Lookup</button>
   <div id="result"></div>
 
@@ -35,6 +36,10 @@
 
     function lookupReference() {
       const refInput = document.getElementById('reference').value.trim().toUpperCase();
+      if (!refInput) {
+        alert('Please enter a reference number.');
+        return;
+      }
       const prefix = refInput.slice(0, 2);
       const modelVariant = refInput.slice(2, -1);
       const suffix = /[A-Z]$/.test(refInput) ? refInput.slice(-1) : null;
