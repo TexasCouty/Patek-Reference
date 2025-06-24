@@ -34,20 +34,26 @@ async function lookupReference() {
       const data = await chatResponse.json();
       console.log("ChatGPT Fallback Response:", data);
 
+      // Try to parse the answer as JSON
+      let parsed;
       try {
-        const parsed = JSON.parse(data.answer);
-        resultDiv.innerHTML = `
-          <h2>Reference: ${parsed["Reference Number"]}</h2>
-          <p><strong>Retail Price:</strong> ${parsed["Retail Price"]}</p>
-          <p><strong>Dial:</strong> ${parsed["Dial"]}</p>
-          <p><strong>Case:</strong> ${parsed["Case"]}</p>
-          <p><strong>Bracelet:</strong> ${parsed["Bracelet"]}</p>
-          <p><strong>Movement:</strong> ${parsed["Movement"]}</p>
-        `;
+        parsed = JSON.parse(data.answer);
       } catch (e) {
-        console.error("Failed to parse ChatGPT JSON:", e, data.answer);
-        resultDiv.innerHTML = `<pre>${data.answer}</pre>`;
+        console.error("Failed to parse JSON, showing raw:", data.answer);
+        resultDiv.innerHTML = `<p>${data.answer}</p>`;
+        return;
       }
+
+      // Rebuild same HTML structure for consistent look
+      resultDiv.innerHTML = `
+        <h2>Reference: ${parsed["Reference Number"]}</h2>
+        <p><strong>Retail Price:</strong> ${parsed["Retail Price"]}</p>
+        <p><strong>Dial:</strong> ${parsed["Dial"]}</p>
+        <p><strong>Case:</strong> ${parsed["Case"]}</p>
+        <p><strong>Bracelet:</strong> ${parsed["Bracelet"]}</p>
+        <p><strong>Movement:</strong> ${parsed["Movement"]}</p>
+      `;
+
     } catch (err) {
       console.error("Error calling ChatGPT function:", err);
       resultDiv.innerHTML = `<p>Error: Could not get answer from ChatGPT</p>`;
