@@ -9,12 +9,13 @@ export async function handler(event) {
 
     const prompt = `Provide ONLY raw JSON, no code block or markdown, for Patek Philippe reference number ${reference} in this concise style:
 {
-  "Reference Number": "same format as JSON",
-  "Retail Price": "short, exact dollar value",
-  "Dial": "short, single word or phrase like 'Blue'",
-  "Case": "one word material like 'Steel'",
+  "Reference Number": "exact reference",
+  "Retail Price": "short dollar amount",
+  "Dial": "short phrase like 'Blue'",
+  "Case": "one word like 'Steel'",
   "Bracelet": "same short format",
-  "Movement": "short caliber name only"
+  "Movement": "short caliber only",
+  "Image URL": "realistic public image URL for this reference or a placeholder like 'https://www.patek.com/img/watch_placeholder.jpg' if unavailable"
 }
 Example for style:
 {
@@ -23,9 +24,10 @@ Example for style:
   "Dial": "Blue",
   "Case": "Steel",
   "Bracelet": "Steel",
-  "Movement": "Caliber 26‑330 S C"
+  "Movement": "Caliber 26‑330 S C",
+  "Image URL": "https://www.patek.com/img/5711_1A.jpg"
 }
-Answer for ${reference} only in this short JSON style, no extra text.`;
+Answer for ${reference} only in this short JSON style. If no real image exists, provide a placeholder link. No other text.`;
 
     console.log("Prompt to OpenAI:", prompt);
 
