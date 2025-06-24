@@ -59,13 +59,6 @@ export async function handler(event) {
     const text = await response.text();
     console.log("GPT raw text:", text);
 
-    if (!text) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "OpenAI returned empty response" })
-      };
-    }
-
     const data = JSON.parse(text);
     let answer = data.choices[0].message.content.trim();
 
@@ -88,26 +81,29 @@ export async function handler(event) {
       };
     }
 
-    // ✅ Use shared client
-    const client = await connectToDatabase();
-    const collection = client.db('patek_db').collection('references');
+    // ✅ Save in background (fire and forget)
+    connectToDatabase().then(async (client) => {
+      const collection = client.db('patek_db').collection('references');
+      const exists = await collection.findOne({ reference: parsed["Reference Number"] });
+      if (!exists) {
+        await collection.insertOne({
+          reference: parsed["Reference Number"],
+          retail_price: parsed["Retail Price"],
+          collection: parsed["Collection"],
+          dial: parsed["Dial"],
+          case: parsed["Case"],
+          bracelet: parsed["Bracelet"],
+          movement: parsed["Movement"]
+        });
+        console.log(`✅ Saved ${parsed["Reference Number"]} to MongoDB`);
+      } else {
+        console.log(`ℹ️ ${parsed["Reference Number"]} already exists in MongoDB`);
+      }
+    }).catch((err) => {
+      console.error("❌ Background MongoDB save failed:", err);
+    });
 
-    const exists = await collection.findOne({ reference: parsed["Reference Number"] });
-    if (!exists) {
-      await collection.insertOne({
-        reference: parsed["Reference Number"],
-        retail_price: parsed["Retail Price"],
-        collection: parsed["Collection"],
-        dial: parsed["Dial"],
-        case: parsed["Case"],
-        bracelet: parsed["Bracelet"],
-        movement: parsed["Movement"]
-      });
-      console.log(`✅ Saved ${parsed["Reference Number"]} to MongoDB`);
-    } else {
-      console.log(`ℹ️ ${parsed["Reference Number"]} already exists in MongoDB`);
-    }
-
+    // ✅ Return immediately
     return {
       statusCode: 200,
       body: JSON.stringify({ answer })
@@ -121,4 +117,3 @@ export async function handler(event) {
     };
   }
 }
-
