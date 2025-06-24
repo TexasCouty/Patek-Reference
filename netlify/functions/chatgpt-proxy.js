@@ -3,17 +3,17 @@ const path = require('path');
 
 exports.handler = async function (event) {
   try {
-    // ✅ Parse input
+    // ✅ 1️⃣ Parse input and normalize to uppercase
     const { reference } = JSON.parse(event.body);
     const ref = reference.toUpperCase();
     console.log(`🔍 Looking up reference: ${ref}`);
 
-    // ✅ Load local JSON (kept in same folder for guaranteed packaging!)
+    // ✅ 2️⃣ Load JSON from SAME FOLDER as this function
     const jsonPath = path.join(__dirname, 'patek_refs.json');
     console.log(`📁 Using JSON at: ${jsonPath}`);
     const refs = JSON.parse(fs.readFileSync(jsonPath));
 
-    // ✅ Check for local match
+    // ✅ 3️⃣ Try to find local data
     const official = refs[ref];
     if (official) {
       console.log(`✅ Found local data for: ${ref}`);
@@ -30,10 +30,10 @@ Link: ${official.link}`;
       };
     }
 
-    console.log(`⚠️ Not found in local JSON — querying ChatGPT for: ${ref}`);
+    console.log(`⚠️ Not found locally — querying ChatGPT for: ${ref}`);
 
-    // ✅ If not found, fallback to ChatGPT
-    const prompt = `You are a Patek Philippe expert. Give an elegant, accurate description for reference ${ref}. Include: Collection, Case, Dial, Strap, Movement, Water Resistance if known.`;
+    // ✅ 4️⃣ Fallback: get description from ChatGPT
+    const prompt = `You are a Patek Philippe expert. Write an elegant sales description for reference ${ref}. Include Collection, Case, Dial, Strap, Movement, Water Resistance if known.`;
 
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
