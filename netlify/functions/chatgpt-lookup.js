@@ -1,5 +1,15 @@
 import { MongoClient } from 'mongodb';
 
+let cachedClient = null;
+
+async function connectToDatabase() {
+  if (cachedClient) return cachedClient;
+  const client = new MongoClient(process.env.MONGODB_URI);
+  await client.connect();
+  cachedClient = client;
+  return client;
+}
+
 export async function handler(event) {
   try {
     const { reference } = JSON.parse(event.body);
@@ -78,9 +88,8 @@ export async function handler(event) {
       };
     }
 
-    // ✅ SAVE TO MONGODB ONLY (NO LOCAL FILE!)
-    const client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
+    // ✅ Use shared client
+    const client = await connectToDatabase();
     const collection = client.db('patek_db').collection('references');
 
     const exists = await collection.findOne({ reference: parsed["Reference Number"] });
@@ -99,8 +108,6 @@ export async function handler(event) {
       console.log(`ℹ️ ${parsed["Reference Number"]} already exists in MongoDB`);
     }
 
-    await client.close();
-
     return {
       statusCode: 200,
       body: JSON.stringify({ answer })
@@ -114,3 +121,4 @@ export async function handler(event) {
     };
   }
 }
+
