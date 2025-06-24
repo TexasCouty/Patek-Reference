@@ -41,7 +41,7 @@ export async function handler(event) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'gpt-4o-turbo',   // ✅ TURBO version for speed & cost savings
+          model: 'gpt-4-turbo',  // ✅ OFFICIAL turbo model that works!
           messages: [{ role: 'user', content: prompt }]
         }),
         signal: controller.signal
@@ -59,7 +59,17 @@ export async function handler(event) {
     const text = await response.text();
     console.log("GPT raw text:", text);
 
-    const data = JSON.parse(text);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      console.error("❌ Failed to parse OpenAI response JSON:", err);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Invalid OpenAI response JSON." })
+      };
+    }
+
     let answer = data.choices[0].message.content.trim();
 
     if (answer.startsWith("```json")) {
@@ -81,7 +91,7 @@ export async function handler(event) {
       };
     }
 
-    // ✅ Ensure MongoDB save completes BEFORE responding:
+    // ✅ Save to MongoDB BEFORE responding:
     const client = await connectToDatabase();
     const collection = client.db('patek_db').collection('references');
 
@@ -101,7 +111,6 @@ export async function handler(event) {
       console.log(`ℹ️ ${parsed["Reference Number"]} already exists in MongoDB`);
     }
 
-    // ✅ Respond to client
     return {
       statusCode: 200,
       body: JSON.stringify({ answer })
@@ -115,3 +124,4 @@ export async function handler(event) {
     };
   }
 }
+
