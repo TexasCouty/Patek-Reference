@@ -1,81 +1,18 @@
-{
-  "5167A-001": {
-    "collection": "Aquanaut",
-    "case": "Steel. Diameter (10-4 o'clock): 40.8 mm. Thickness: 8.1 mm. Water-resistant to 30m. Screw-down crown. Sapphire crystal case back.",
-    "dial": "Sunburst charcoal gray with black-gradient rim, embossed Aquanaut pattern, white gold applied numerals with white luminescent coating. White gold baton-style hands with white luminescent coating.",
-    "strap": "Black tropical composite strap with Aquanaut fold-over clasp.",
-    "movement": "26-330 S C, self-winding, Date in an aperture, sweep seconds. Diameter: 27 mm. Thickness: 3.32 mm. Power reserve: min. 35 hours – max. 45 hours. Winding rotor: 21K gold central rotor. Gyromax®. Frequency: 28,800 semi-oscillations/hour (4 Hz). Balance spring: Spiromax®",
-    "retail price": "$25958",
-    "link": "https://www.patek.com/en/collection/aquanaut/5167a-001"
+[
+  {
+    "reference": "5711/1A",
+    "retail_price": "$34,893",
+    "dial": "Blue",
+    "case": "Steel",
+    "bracelet": "Steel",
+    "movement": "Caliber 26‑330 S C"
   },
-  "5167R-001": {
-    "collection": "Aquanaut",
-    "case": "Rose gold. Diameter (10-4 o'clock): 40.8 mm. Thickness: 8.1 mm. Water-resistant to 30m. Screw-down crown. Sapphire crystal case back.",
-    "dial": "Sunburst brown with black-gradient rim, embossed Aquanaut pattern, rose gold applied numerals with white luminescent coating. Rose gold baton-style hands with white luminescent coating..",
-    "strap": "Brown tropical composite strap with Aquanaut fold-over clasp.",
-    "movement": "26-330 S C, self-winding, Date in an aperture, sweep seconds. Diameter: 27 mm. Thickness: 3.32 mm. Power reserve: min. 35 hours – max. 45 hours. Winding rotor: 21K gold central rotor. Gyromax®. Frequency: 28,800 semi-oscillations/hour (4 Hz). Balance spring: Spiromax®",
-    "retail price": "$50927",
-    "link": "https://www.patek.com/en/collection/aquanaut/5167r-001"
-  },
-  "5164R-001": {
-    "collection": "Aquanaut",
-    "case": "Rose gold. Diameter (10-4 o'clock): 40.8 mm. Thickness: 10.2 mm. Water-resistant to 30m. Screw-down crown. Sapphire crystal case back.",
-    "dial": "Sunburst brown, embossed Aquanaut pattern, rose gold applied numerals with white luminescent coating. Local time hand: rose gold baton-style with white luminescent coating. Home time hand: white gold skeletonized baton-style hand, white varnished.",
-    "movement": "26-330 S C FUS, self-winding, Two time zones: local and home time indication,Day/night indication for local and home time in apertures,Date coupled with local time by hand , sweep seconds. Diameter: 31 mm. Thickness: 4.82 mm. Number of parts: 290. Number of jewels: 29. Power reserve: min. 35 hours – max. 45 hours. Winding rotor: 21K gold central rotor. Gyromax®. Frequency: 28,800 semi-oscillations/hour (4 Hz). Balance spring: Spiromax®. Distinctive sign: Patek Philippe Seal.",
-    "retail price": "$68109",
-    "link": "https://www.patek.com/en/collection/aquanaut/5164r-001"
-  },
-  "5168G-001": {
-    "collection": "Aquanaut",
-    "case": "White gold. Diameter (10-4 o'clock): 42.2 mm. Thickness: 8.25 mm. Water-resistant to 30m. Screw-down crown. Sapphire crystal case back.",
-    "dial": "Sunburst blue with black-gradient rim, embossed Aquanaut pattern, white gold applied numerals with white luminescent coating. White gold baton-style hands with white luminescent coating.",
-    "movement": "26-330 S C, self-winding, Date in an aperture, sweep seconds.Diameter: 27 mm. Thickness: 3.32 mm. Number of parts: 212. Number of jewels: 30. Power reserve: min. 35 hours – max. 45 hours. Winding rotor: 21K gold central rotor. Gyromax®. Frequency: 28,800 semi-oscillations/hour (4 Hz). Balance spring: Spiromax®. Distinctive sign: Patek Philippe Seal.",
-    "retail price": "$55006",
-    "link": "https://www.patek.com/en/collection/aquanaut/5168g-001"
-  },
-  "5711/1A-010": {
-    "collection": "Nautilus",
-    "case": "Stainless steel, water-resistant to 120m, diameter 40 mm, thickness 8.3 mm.",
-    "dial": "Blue embossed dial with gold applied hour markers and luminescent coating.",
-    "strap": "Stainless steel bracelet with Nautilus fold-over clasp.",
-    "movement": "Caliber 324 S C, self-winding, date, sweep seconds.",
-    "retail price": "$25958",
-    "link": "https://www.patek.com/en/collection/nautilus/5711-1a-010"
-  },
-  "5712/1A-001": {
-    "collection": "Nautilus",
-    "case": "Stainless steel, sapphire-crystal case back, water-resistant to 60m, diameter 40 mm.",
-    "dial": "Blue embossed dial with date, moon phases and power reserve indicators.",
-    "strap": "Stainless steel bracelet with Nautilus fold-over clasp.",
-    "movement": "Caliber 240 PS IRM C LU, self-winding, moon phase, power reserve, date.",
-    "retail price": "$25958",
-    "link": "https://www.patek.com/en/collection/nautilus/5712-1a-001"
-  },
-  "5227J-001": {
-    "collection": "Calatrava",
-    "case": "18K yellow gold, officer's-style hinged back, sapphire-crystal case back, water-resistant to 30m, diameter 39 mm.",
-    "dial": "Ivory lacquered dial with gold applied hour markers.",
-    "strap": "Hand-stitched alligator strap with prong buckle.",
-    "movement": "Caliber 324 S C, self-winding, date, sweep seconds.",
-    "retail price": "$25958",
-    "link": "https://www.patek.com/en/collection/calatrava/5227j-001"
-  },
-  "5205G-013": {
-    "collection": "Complications",
-    "case": "18K white gold, sapphire-crystal case back, water-resistant to 30m, diameter 40 mm.",
-    "dial": "Blue sunburst dial with annual calendar and moon phases.",
-    "strap": "Alligator leather strap with fold-over clasp.",
-    "movement": "Caliber 324 S QA LU 24H/206, self-winding, annual calendar, moon phase, 24-hour indication.",
-    "retail price": "$25958",
-    "link": "https://www.patek.com/en/collection/complications/5205g-013"
-  },
-  "5327J-001": {
-    "collection": "Grand Complications",
-    "case": "18K yellow gold, sapphire-crystal case back, water-resistant to 30m, diameter 39 mm.",
-    "dial": "Lacquered cream dial with day, date, month, leap year and moon phases.",
-    "strap": "Alligator leather strap with fold-over clasp.",
-    "movement": "Caliber 240 Q, self-winding, perpetual calendar, moon phase, leap year.",
-    "retail price": "$25958",
-    "link": "https://www.patek.com/en/collection/grand-complications/5327j-001"
+  {
+    "reference": "5167A",
+    "retail_price": "$21,650",
+    "dial": "Black",
+    "case": "Steel",
+    "bracelet": "Rubber",
+    "movement": "Caliber 324 S C"
   }
-}
+]
