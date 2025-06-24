@@ -34,7 +34,6 @@ async function lookupReference() {
       const data = await chatResponse.json();
       console.log("ChatGPT Fallback Response:", data);
 
-      // Try to parse the answer as JSON
       let parsed;
       try {
         parsed = JSON.parse(data.answer);
@@ -44,7 +43,6 @@ async function lookupReference() {
         return;
       }
 
-      // Rebuild same HTML structure for consistent look
       resultDiv.innerHTML = `
         <h2>Reference: ${parsed["Reference Number"]}</h2>
         <p><strong>Retail Price:</strong> ${parsed["Retail Price"]}</p>
@@ -52,11 +50,12 @@ async function lookupReference() {
         <p><strong>Case:</strong> ${parsed["Case"]}</p>
         <p><strong>Bracelet:</strong> ${parsed["Bracelet"]}</p>
         <p><strong>Movement:</strong> ${parsed["Movement"]}</p>
+        ${parsed["Image URL"] ? `<img src="${parsed["Image URL"]}" alt="Watch Image" style="max-width:300px;margin-top:15px;">` : ""}
       `;
-
     } catch (err) {
       console.error("Error calling ChatGPT function:", err);
       resultDiv.innerHTML = `<p>Error: Could not get answer from ChatGPT</p>`;
     }
   }
 }
+
