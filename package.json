@@ -1,17 +1,7 @@
 {
-  "name": "patek-reference",
-  "version": "1.0.0",
-  "description": "",
   "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"No test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
-    "mongodb": "^6.17.0",
-    "puppeteer": "^24.10.2"
+    "mongodb": "^5.9.2",
+    "openai": "^4.25.0"
   }
 }
