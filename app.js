@@ -1,21 +1,25 @@
-async function lookupReference() {
-  const ref = document.getElementById('refInput').value.trim();
-  const response = await fetch('patek_refs.json');
-  const data = await response.json();
+} else {
+  resultDiv.innerHTML = `<p>Reference not found locally. Asking ChatGPT...</p>`;
 
-  const match = data.find(item => item.reference.toLowerCase() === ref.toLowerCase());
-  const resultDiv = document.getElementById('result');
+  try {
+    const chatResponse = await fetch('/.netlify/functions/chatgpt-lookup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ reference: ref })
+    });
 
-  if (match) {
-    resultDiv.innerHTML = `
-      <h2>Reference: ${match.reference}</h2>
-      <p><strong>Retail Price:</strong> ${match.retail_price}</p>
-      <p><strong>Dial:</strong> ${match.dial}</p>
-      <p><strong>Case:</strong> ${match.case}</p>
-      <p><strong>Bracelet:</strong> ${match.bracelet}</p>
-      <p><strong>Movement:</strong> ${match.movement}</p>
-    `;
-  } else {
-    resultDiv.innerHTML = `<p>Reference not found.</p>`;
+    if (!chatResponse.ok) {
+      throw new Error(`Function returned ${chatResponse.status}`);
+    }
+
+    const data = await chatResponse.json();
+    console.log("ChatGPT Fallback Response:", data); // ✅ verify
+
+    resultDiv.innerHTML = `<pre>${data.answer}</pre>`;
+  } catch (err) {
+    console.error("Error calling ChatGPT function:", err);
+    resultDiv.innerHTML = `<p>Error: Could not get answer from ChatGPT</p>`;
   }
 }
