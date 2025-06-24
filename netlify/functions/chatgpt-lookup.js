@@ -41,7 +41,7 @@ export async function handler(event) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-turbo',   // ✅ TURBO version for speed & cost savings
           messages: [{ role: 'user', content: prompt }]
         }),
         signal: controller.signal
@@ -81,7 +81,7 @@ export async function handler(event) {
       };
     }
 
-    // ✅ Connect and ensure the save completes BEFORE responding:
+    // ✅ Ensure MongoDB save completes BEFORE responding:
     const client = await connectToDatabase();
     const collection = client.db('patek_db').collection('references');
 
@@ -101,7 +101,7 @@ export async function handler(event) {
       console.log(`ℹ️ ${parsed["Reference Number"]} already exists in MongoDB`);
     }
 
-    // ✅ NOW return
+    // ✅ Respond to client
     return {
       statusCode: 200,
       body: JSON.stringify({ answer })
@@ -115,4 +115,3 @@ export async function handler(event) {
     };
   }
 }
-
