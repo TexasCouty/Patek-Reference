@@ -1,65 +1,136 @@
+import fs from 'fs';
+import path from 'path';
+
 export async function handler(event) {
-  console.log("Function triggered");
-
   try {
-    console.log("Raw event body:", event.body);
-
     const { reference } = JSON.parse(event.body);
     console.log("Parsed reference:", reference);
 
-    const prompt = `Provide ONLY raw JSON, no code block or markdown, for Patek Philippe reference number ${reference} in this concise style:
-{
-  "Reference Number": "exact reference",
-  "Retail Price": "short dollar amount",
-  "Dial": "short phrase like 'Blue'",
-  "Case": "one word like 'Steel'",
-  "Bracelet": "same short format",
-  "Movement": "short caliber only",
-  "Image URL": "realistic public image URL for this reference or a placeholder like 'https://www.patek.com/img/watch_placeholder.jpg' if unavailable"
-}
-Example for style:
-{
-  "Reference Number": "5711/1A",
-  "Retail Price": "$34,893",
-  "Dial": "Blue",
-  "Case": "Steel",
-  "Bracelet": "Steel",
-  "Movement": "Caliber 26‑330 S C",
-  "Image URL": "https://www.patek.com/img/5711_1A.jpg"
-}
-Answer for ${reference} only in this short JSON style. If no real image exists, provide a placeholder link. No other text.`;
+    const prompt = `
+      Provide ONLY raw JSON for Patek Philippe reference ${reference}:
+      {
+        "Reference Number": "...",
+        "Retail Price": "...",
+        "Collection": "...",
+        "Dial": "...",
+        "Case": "...",
+        "Bracelet": "...",
+        "Movement": "..."
+      }
+      Answer for ${reference} ONLY in this JSON format. No markdown or code fences.
+    `;
 
-    console.log("Prompt to OpenAI:", prompt);
+    // ✅ Native fetch with manual timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
+    let response;
+    try {
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: prompt }]
+        }),
+        signal: controller.signal
+      });
+    } catch (err) {
+      console.error("❌ OpenAI fetch failed or aborted:", err);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "OpenAI request failed or timed out." })
+      };
+    } finally {
+      clearTimeout(timeout);
+    }
 
-    console.log("OpenAI API status:", response.status);
+    // ✅ Robust parse: first get raw text, then parse manually
+    const text = await response.text();
+    console.log("GPT raw text:", text);
 
-    const data = await response.json();
-    console.log("OpenAI raw response:", JSON.stringify(data));
+    if (!text) {
+      console.error("❌ OpenAI returned empty response");
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "OpenAI returned empty response" })
+      };
+    }
 
-    const answer = data.choices[0].message.content.trim();
-    console.log("Extracted answer:", answer);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Failed to parse JSON:", e);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Failed to parse OpenAI response JSON" })
+      };
+    }
+
+    let answer = data.choices[0].message.content.trim();
+
+    // ✅ Strip possible code fences
+    if (answer.startsWith("```json")) {
+      answer = answer.replace(/^```json/, '').replace(/```$/, '').trim();
+    } else if (answer.startsWith("```")) {
+      answer = answer.replace(/^```/, '').replace(/```$/, '').trim();
+    }
+
+    console.log("Cleaned GPT answer:", answer);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(answer);
+    } catch (e) {
+      console.error("❌ Failed to parse cleaned answer:", e);
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ answer })
+      };
+    }
+
+    // ✅ Try to save locally
+    try {
+      const jsonPath = path.resolve('patek_refs.json');
+      const refs = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+
+      const exists = refs.find(r =>
+        r.reference.toLowerCase() === parsed["Reference Number"].toLowerCase()
+      );
+
+      if (!exists) {
+        refs.push({
+          reference: parsed["Reference Number"],
+          retail_price: parsed["Retail Price"],
+          collection: parsed["Collection"],
+          dial: parsed["Dial"],
+          case: parsed["Case"],
+          bracelet: parsed["Bracelet"],
+          movement: parsed["Movement"]
+        });
+        fs.writeFileSync(jsonPath, JSON.stringify(refs, null, 2));
+        console.log(`✅ Added ${parsed["Reference Number"]} to local patek_refs.json`);
+      } else {
+        console.log(`ℹ️ ${parsed["Reference Number"]} already exists`);
+      }
+    } catch (writeErr) {
+      console.error("❌ Local JSON save failed:", writeErr);
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ answer }),
+      body: JSON.stringify({ answer })
     };
-  } catch (error) {
-    console.error("Error in function:", error);
+
+  } catch (err) {
+    console.error("❌ Top-level function error:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.toString() }),
+      body: JSON.stringify({ error: err.toString() })
     };
   }
 }
