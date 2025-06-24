@@ -1,10 +1,7 @@
 import fetch from "node-fetch";
 import { MongoClient } from "mongodb";
 
-// Debug toggle
 const DEBUG = true;
-
-// Global Mongo reuse
 let cachedClient = null;
 
 export default async (req, res) => {
@@ -12,16 +9,16 @@ export default async (req, res) => {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { reference } = JSON.parse(req.body);
+  // ✅ FIX: Netlify parses body already — DO NOT parse again!
+  const { reference } = req.body; 
   if (DEBUG) console.log("🔵 Function triggered");
   if (DEBUG) console.log("📌 Reference:", reference);
 
-  // ✅ Check MongoDB first
   const MONGO_URI = process.env.MONGODB_URI;
   const DB_NAME = "patek_db";
   const COLL_NAME = "references";
 
-  if (DEBUG) console.log("⏳ Connecting to MongoDB:", MONGO_URI);
+  if (DEBUG) console.log("⏳ Connecting to MongoDB...");
 
   try {
     if (!cachedClient) {
@@ -37,13 +34,13 @@ export default async (req, res) => {
       if (DEBUG) console.log("✅ Found in MongoDB!");
       return res.status(200).json(doc);
     } else {
-      if (DEBUG) console.log("❌ Not found in MongoDB — will ask GPT...");
+      if (DEBUG) console.log("❌ Not found in MongoDB — asking GPT...");
     }
   } catch (err) {
-    if (DEBUG) console.error("❌ Mongo ERROR:", err);
+    if (DEBUG) console.error("❌ Mongo error:", err);
   }
 
-  // ✅ Fallback: Ask GPT
+  // ✅ Fallback: ask GPT
   if (DEBUG) console.log("⏳ Calling OpenAI...");
   const chatResponse = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -56,7 +53,7 @@ export default async (req, res) => {
       messages: [
         {
           role: "user",
-          content: `Provide ONLY raw JSON for Patek reference ${reference} like:
+          content: `Provide ONLY raw JSON for Patek reference ${reference}:
 {
   "Reference Number": "...",
   "Retail Price": "...",
@@ -66,7 +63,7 @@ export default async (req, res) => {
   "Bracelet": "...",
   "Movement": "..."
 }
-No markdown, no text — JSON only.`
+No markdown — JSON only.`
         },
       ],
     }),
@@ -84,7 +81,7 @@ No markdown, no text — JSON only.`
     return res.status(500).json({ error: "Could not parse GPT answer" });
   }
 
-  // ✅ Save GPT answer to MongoDB
+  // ✅ Save to MongoDB
   try {
     if (cachedClient) {
       const db = cachedClient.db(DB_NAME);
