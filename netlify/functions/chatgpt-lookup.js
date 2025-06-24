@@ -7,15 +7,25 @@ export async function handler(event) {
     const { reference } = JSON.parse(event.body);
     console.log("Parsed reference:", reference);
 
-    const prompt = `Provide details about Patek Philippe reference number ${reference} in strict JSON format:
+    const prompt = `Provide ONLY raw JSON, no code block or markdown, for Patek Philippe reference number ${reference} in this concise style:
 {
-  "Reference Number": "",
-  "Retail Price": "",
-  "Dial": "",
-  "Case": "",
-  "Bracelet": "",
-  "Movement": ""
-}`;
+  "Reference Number": "same format as JSON",
+  "Retail Price": "short, exact dollar value",
+  "Dial": "short, single word or phrase like 'Blue'",
+  "Case": "one word material like 'Steel'",
+  "Bracelet": "same short format",
+  "Movement": "short caliber name only"
+}
+Example for style:
+{
+  "Reference Number": "5711/1A",
+  "Retail Price": "$34,893",
+  "Dial": "Blue",
+  "Case": "Steel",
+  "Bracelet": "Steel",
+  "Movement": "Caliber 26‑330 S C"
+}
+Answer for ${reference} only in this short JSON style, no extra text.`;
 
     console.log("Prompt to OpenAI:", prompt);
 
@@ -36,7 +46,7 @@ export async function handler(event) {
     const data = await response.json();
     console.log("OpenAI raw response:", JSON.stringify(data));
 
-    const answer = data.choices[0].message.content;
+    const answer = data.choices[0].message.content.trim();
     console.log("Extracted answer:", answer);
 
     return {
