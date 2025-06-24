@@ -1,18 +1,47 @@
 [
   {
-    "reference": "5711/1A",
-    "retail_price": "$34,893",
-    "dial": "Blue",
-    "case": "Steel",
-    "bracelet": "Steel",
-    "movement": "Caliber 26‑330 S C"
+    "reference": "5726-1A-014",
+    "retail_price": "$59,703",
+    "collection": "Nautilus",
+    "dial": "Update manually or add scraper",
+    "case": "Update manually or add scraper",
+    "bracelet": "Update manually or add scraper",
+    "movement": "Update manually or add scraper"
   },
   {
-    "reference": "5167A",
-    "retail_price": "$21,650",
-    "dial": "Black",
+    "reference": "5711-1A",
+    "retail_price": "Unavailable",
+    "collection": "Nautilus",
+    "dial": "Update manually or add scraper",
+    "case": "Update manually or add scraper",
+    "bracelet": "Update manually or add scraper",
+    "movement": "Update manually or add scraper"
+  },
+  {
+    "reference": "5167A-001",
+    "retail_price": "Unavailable",
+    "collection": "Aquanaut",
+    "dial": "Update manually or add scraper",
+    "case": "Update manually or add scraper",
+    "bracelet": "Update manually or add scraper",
+    "movement": "Update manually or add scraper"
+  },
+  {
+    "reference": "5726A-001",
+    "retail_price": "$54,141",
+    "collection": "Nautilus",
+    "dial": "Sunburst charcoal gray with black-gradient rim",
     "case": "Steel",
-    "bracelet": "Rubber",
-    "movement": "Caliber 324 S C"
+    "bracelet": "Alligator leather",
+    "movement": "26-330 S QA LU 24H"
+  },
+  {
+    "reference": "7140G-001",
+    "retail_price": "$93,250",
+    "collection": "Complications",
+    "dial": "Opaline-white",
+    "case": "White gold",
+    "bracelet": "Taupe alligator leather",
+    "movement": "Caliber 240 Q"
   }
 ]
