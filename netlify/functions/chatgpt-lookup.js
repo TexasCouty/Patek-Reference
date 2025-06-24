@@ -1,8 +1,9 @@
 import { MongoClient } from 'mongodb';
 
-const DEBUG = true; // ✅ Turn to false for production
+const DEBUG = true; // Turn off in production
 let cachedClient = null;
 
+// Reuse MongoDB client for efficiency
 async function connectToDatabase() {
   if (cachedClient) {
     if (DEBUG) console.log("✅ Reusing cached MongoDB client");
@@ -24,7 +25,23 @@ export async function handler(event) {
     const { reference } = JSON.parse(event.body);
     if (DEBUG) console.log(`📌 Reference: ${reference}`);
 
-    // OpenAI prompt
+    // ✅ 1) Connect to MongoDB
+    const client = await connectToDatabase();
+    const collection = client.db('patek_db').collection('references');
+
+    // ✅ 2) Try MongoDB first
+    const existing = await collection.findOne({ reference: reference });
+    if (existing) {
+      if (DEBUG) console.log(`✅ Found ${reference} in MongoDB`);
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ answer: existing })
+      };
+    }
+
+    if (DEBUG) console.log(`❌ Not found in MongoDB, calling OpenAI...`);
+
+    // ✅ 3) If not found → ask OpenAI
     const prompt = `
       Provide ONLY raw JSON for Patek Philippe reference ${reference}:
       {
@@ -36,11 +53,9 @@ export async function handler(event) {
         "Bracelet": "...",
         "Movement": "..."
       }
-      Answer ONLY in JSON. No markdown.
+      Answer ONLY in JSON, no markdown.
     `;
 
-    // Call OpenAI
-    if (DEBUG) console.log("⏳ Calling OpenAI...");
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -66,27 +81,18 @@ export async function handler(event) {
 
     const parsed = JSON.parse(answer);
 
-    // Save to MongoDB
-    const dbStart = Date.now();
-    const client = await connectToDatabase();
-    const collection = client.db('patek_db').collection('references');
-
-    const exists = await collection.findOne({ reference: parsed["Reference Number"] });
-    if (exists) {
-      if (DEBUG) console.log(`ℹ️ ${parsed["Reference Number"]} already in DB`);
-    } else {
-      await collection.insertOne({
-        reference: parsed["Reference Number"],
-        retail_price: parsed["Retail Price"],
-        collection: parsed["Collection"],
-        dial: parsed["Dial"],
-        case: parsed["Case"],
-        bracelet: parsed["Bracelet"],
-        movement: parsed["Movement"],
-        addedAt: new Date()
-      });
-      if (DEBUG) console.log(`✅ Saved ${parsed["Reference Number"]} to MongoDB in ${Date.now() - dbStart}ms`);
-    }
+    // ✅ 4) Save to MongoDB for next time
+    await collection.insertOne({
+      reference: parsed["Reference Number"],
+      retail_price: parsed["Retail Price"],
+      collection: parsed["Collection"],
+      dial: parsed["Dial"],
+      case: parsed["Case"],
+      bracelet: parsed["Bracelet"],
+      movement: parsed["Movement"],
+      addedAt: new Date()
+    });
+    if (DEBUG) console.log(`✅ Saved ${parsed["Reference Number"]} to MongoDB`);
 
     if (DEBUG) console.log(`✅ Function finished in ${Date.now() - start}ms`);
 
