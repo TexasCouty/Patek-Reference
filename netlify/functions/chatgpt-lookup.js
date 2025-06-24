@@ -1,26 +1,28 @@
 import { MongoClient } from 'mongodb';
 
+const DEBUG = true; // ✅ Toggle to false for production: no logs!
+
 let cachedClient = null;
 
 async function connectToDatabase() {
   if (cachedClient) {
-    console.log("✅ Reusing cached MongoDB client");
+    if (DEBUG) console.log("✅ Reusing cached MongoDB client");
     return cachedClient;
   }
-  console.log("⏳ Connecting to MongoDB...");
+  if (DEBUG) console.log("⏳ Connecting to MongoDB...");
   const client = new MongoClient(process.env.MONGODB_URI);
   await client.connect();
-  console.log("✅ Connected to MongoDB");
+  if (DEBUG) console.log("✅ Connected to MongoDB");
   cachedClient = client;
   return client;
 }
 
 export async function handler(event) {
-  console.log("🔵 Function triggered");
   const startTime = Date.now();
+  if (DEBUG) console.log("🔵 Function triggered");
   try {
     const { reference } = JSON.parse(event.body);
-    console.log(`📌 Parsed reference: ${reference}`);
+    if (DEBUG) console.log(`📌 Parsed reference: ${reference}`);
 
     const prompt = `
       Provide ONLY raw JSON for Patek Philippe reference ${reference}:
@@ -36,7 +38,7 @@ export async function handler(event) {
       Answer for ${reference} ONLY in this JSON format. No markdown or code fences.
     `;
 
-    console.log("⏳ Sending request to OpenAI...");
+    if (DEBUG) console.log("⏳ Sending request to OpenAI...");
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
@@ -54,16 +56,16 @@ export async function handler(event) {
         }),
         signal: controller.signal
       });
-      console.log(`✅ OpenAI response received in ${Date.now() - startTime}ms`);
+      if (DEBUG) console.log(`✅ OpenAI response received in ${Date.now() - startTime}ms`);
     } catch (err) {
-      console.error("❌ OpenAI fetch failed:", err);
+      if (DEBUG) console.error("❌ OpenAI fetch failed:", err);
       return { statusCode: 500, body: JSON.stringify({ error: "OpenAI request failed." }) };
     } finally {
       clearTimeout(timeout);
     }
 
     const text = await response.text();
-    console.log("📜 GPT raw text:", text);
+    if (DEBUG) console.log("📜 GPT raw text:", text);
 
     const data = JSON.parse(text);
     let answer = data.choices[0].message.content.trim();
@@ -74,20 +76,20 @@ export async function handler(event) {
       answer = answer.replace(/^```/, '').replace(/```$/, '').trim();
     }
 
-    console.log("✅ Cleaned GPT answer:", answer);
+    if (DEBUG) console.log("✅ Cleaned GPT answer:", answer);
 
     let parsed;
     try {
       parsed = JSON.parse(answer);
-      console.log("✅ Parsed GPT JSON successfully");
+      if (DEBUG) console.log("✅ Parsed GPT JSON successfully");
     } catch (err) {
-      console.error("❌ Failed to parse GPT answer:", err);
+      if (DEBUG) console.error("❌ Failed to parse GPT answer:", err);
       return { statusCode: 200, body: JSON.stringify({ answer }) };
     }
 
-    console.log("⏳ Connecting to MongoDB...");
+    if (DEBUG) console.log("⏳ Connecting to MongoDB...");
     const client = await connectToDatabase();
-    console.log(`⏳ Connected, writing to DB for ${parsed["Reference Number"]}...`);
+    if (DEBUG) console.log(`⏳ Connected, writing to DB for ${parsed["Reference Number"]}...`);
 
     const collection = client.db('patek_db').collection('references');
 
@@ -102,19 +104,19 @@ export async function handler(event) {
         bracelet: parsed["Bracelet"],
         movement: parsed["Movement"]
       });
-      console.log(`✅ Inserted ${parsed["Reference Number"]} to MongoDB`);
+      if (DEBUG) console.log(`✅ Inserted ${parsed["Reference Number"]} to MongoDB`);
     } else {
-      console.log(`ℹ️ ${parsed["Reference Number"]} already exists in MongoDB`);
+      if (DEBUG) console.log(`ℹ️ ${parsed["Reference Number"]} already exists in MongoDB`);
     }
 
-    console.log(`✅ ALL DONE in ${Date.now() - startTime}ms`);
+    if (DEBUG) console.log(`✅ ALL DONE in ${Date.now() - startTime}ms`);
     return {
       statusCode: 200,
       body: JSON.stringify({ answer })
     };
 
   } catch (err) {
-    console.error("❌ Function error:", err);
+    if (DEBUG) console.error("❌ Function error:", err);
     return { statusCode: 500, body: JSON.stringify({ error: err.toString() }) };
   }
 }
