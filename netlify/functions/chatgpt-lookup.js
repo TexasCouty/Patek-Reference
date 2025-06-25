@@ -1,12 +1,12 @@
 const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
-  console.log("Function triggered");
+  console.log("⚡️ Function triggered");
 
   try {
-    console.log("Raw event body:", event.body);
+    console.log("📝 Raw event body:", event.body);
     const { reference } = JSON.parse(event.body);
-    console.log("Parsed reference:", reference);
+    console.log("🔍 Parsed reference:", reference);
 
     const prompt = `Provide ONLY raw JSON (no markdown) with these fields for Patek Philippe reference number ${reference}:
 {
@@ -19,7 +19,7 @@ exports.handler = async function (event) {
   "movement": ""
 }`;
 
-    console.log("Prompt to OpenAI:", prompt);
+    console.log("📤 Prompt to OpenAI:", prompt);
 
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -38,13 +38,15 @@ exports.handler = async function (event) {
     });
 
     const data = await openaiResponse.json();
-    console.log("OpenAI raw response:", data);
+    console.log("🤖 OpenAI raw response:", JSON.stringify(data, null, 2));
 
     if (!data.choices || !data.choices[0]?.message?.content) {
+      console.warn("⚠️ OpenAI returned no choices or content.");
       throw new Error("Invalid response from OpenAI.");
     }
 
     const jsonOutput = JSON.parse(data.choices[0].message.content);
+    console.log("✅ Parsed JSON output:", jsonOutput);
 
     return {
       statusCode: 200,
@@ -52,10 +54,11 @@ exports.handler = async function (event) {
     };
 
   } catch (err) {
-    console.error("Function error:", err);
+    console.error("❌ Function error:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message })
     };
   }
 };
+

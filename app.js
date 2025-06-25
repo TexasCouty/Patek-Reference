@@ -32,14 +32,15 @@ async function lookupReference() {
     if (match.movement) formatted += `<p><strong>Movement:</strong> ${match.movement}</p>`;
 
     if (match.reference) {
-      // Only replace slashes with dashes, keep R/G/J etc.
-      let safeRef = match.reference.replace(/\//g, "-");
+      let safeRef = match.reference.replace(/\//g, "-"); // Keep R, G, etc.
       const imgPath = `/images/${safeRef}.avif`;
+
+      console.log("🔍 Trying image path:", imgPath); // For browser DevTools
 
       formatted += `
         <img src="${imgPath}" alt="Watch Image"
              style="max-width:300px; margin-top:20px;"
-             onerror="console.warn('Image not found:', '${imgPath}'); this.onerror=null; this.src='/images/placeholder.avif';" />
+             onerror="console.warn('🛑 Image not found:', '${imgPath}'); this.onerror=null; this.src='/images/placeholder.avif';" />
       `;
     }
 
