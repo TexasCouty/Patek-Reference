@@ -31,7 +31,7 @@ async function lookupReference() {
     if (match.bracelet) formatted += `<p><strong>Bracelet:</strong> ${match.bracelet}</p>`;
     if (match.movement) formatted += `<p><strong>Movement:</strong> ${match.movement}</p>`;
 
-    // Add image after all details (same layout format)
+    // Add image with error logging
     if (match.reference) {
       const safeRef = match.reference.replace(/\//g, "_");
       const imgPath = `/images/${safeRef}.avif`;
@@ -39,7 +39,7 @@ async function lookupReference() {
       formatted += `
         <img src="${imgPath}" alt="Watch Image"
              style="max-width:300px; margin-top:20px;"
-             onerror="this.onerror=null;this.src='/images/placeholder.avif';" />
+             onerror="console.warn('Image not found:', '${imgPath}'); this.onerror=null; this.src='/images/placeholder.avif';" />
       `;
     }
 
