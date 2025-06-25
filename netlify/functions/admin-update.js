@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const formidable = require('formidable');
+const { IncomingForm } = require('formidable');
 
 exports.handler = async function (event, context) {
   console.log("⚡️ Admin function triggered");
@@ -11,9 +11,9 @@ exports.handler = async function (event, context) {
   }
 
   return new Promise((resolve, reject) => {
-    const form = formidable({
+    const form = new IncomingForm({
       multiples: false,
-      uploadDir: '/tmp', // Netlify writable temp dir
+      uploadDir: '/tmp',
       keepExtensions: true
     });
 
