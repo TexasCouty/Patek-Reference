@@ -1,3 +1,5 @@
+// ✅ Updated app.js (with admin panel logic)
+
 async function lookupReference() {
   const ref = document.getElementById('refInput').value.trim();
   const resultDiv = document.getElementById('result');
@@ -22,7 +24,6 @@ async function lookupReference() {
     console.log("Match object:", match);
 
     let formatted = "";
-
     if (match.reference) formatted += `<p><strong>Reference:</strong> ${match.reference}</p>`;
     if (match.retail_price) formatted += `<p><strong>Retail Price:</strong> ${match.retail_price}</p>`;
     if (match.collection) formatted += `<p><strong>Collection:</strong> ${match.collection}</p>`;
@@ -32,10 +33,10 @@ async function lookupReference() {
     if (match.movement) formatted += `<p><strong>Movement:</strong> ${match.movement}</p>`;
 
     if (match.reference) {
-      let safeRef = match.reference.replace(/\//g, "-"); // Keep R, G, etc.
+      let safeRef = match.reference.replace(/\//g, "-");
       const imgPath = `/images/${safeRef}.avif`;
 
-      console.log("🔍 Trying image path:", imgPath); // For browser DevTools
+      console.log("🔍 Trying image path:", imgPath);
 
       formatted += `
         <img src="${imgPath}" alt="Watch Image"
@@ -48,6 +49,41 @@ async function lookupReference() {
   } catch (err) {
     console.error("Lookup failed:", err);
     resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
+  }
+}
+
+function toggleAdmin() {
+  const panel = document.getElementById('adminPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+async function submitAdminUpdate() {
+  const ref = document.getElementById('adminRef').value.trim();
+  const price = document.getElementById('adminPrice').value.trim();
+  const imageFile = document.getElementById('adminImage').files[0];
+  const msg = document.getElementById('adminMsg');
+
+  if (!ref || !price) {
+    msg.innerText = "Reference and price required.";
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('reference', ref);
+  formData.append('retail_price', price);
+  if (imageFile) formData.append('image', imageFile);
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-update', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    msg.innerText = result.message || "Update complete.";
+  } catch (err) {
+    console.error("Admin update failed:", err);
+    msg.innerText = "Error updating data.";
   }
 }
 
