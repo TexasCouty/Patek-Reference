@@ -1,46 +1,61 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('reference');
-  const button = document.getElementById('search');
+async function lookupReference() {
+  const reference = document.getElementById('reference').value;
+  if (!reference) return;
+
   const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = `<p>Searching for reference <strong>${reference}</strong>...</p>`;
 
-  const lookupReference = async () => {
-    const reference = input.value.trim();
-    if (!reference) return;
+  try {
+    const response = await fetch(`/.netlify/functions/chatgpt-lookup`, {
+      method: 'POST',
+      body: JSON.stringify({ reference }),
+    });
 
-    resultDiv.innerHTML = 'Searching...';
+    const data = await response.json();
 
-    try {
-      const response = await fetch('/.netlify/functions/chatgpt-lookup', {
-        method: 'POST',
-        body: JSON.stringify({ reference }),
-      });
+    let imageHtml = '';
+    const imageName = reference.replace(/\//g, '-');
+    const imagePath = `images/${imageName}.avif`;
+    const img = new Image();
+    img.src = imagePath;
+    img.onload = () => {
+      resultDiv.innerHTML = `
+        <p><strong>Reference:</strong> ${data.reference}</p>
+        <p><strong>Retail Price:</strong> ${data.retail_price}</p>
+        <p><strong>Collection:</strong> ${data.collection}</p>
+        <p><strong>Dial:</strong> ${data.dial}</p>
+        <p><strong>Dial Color:</strong> ${data.dial_color || 'N/A'}</p>
+        <p><strong>Case:</strong> ${data.case}</p>
+        <p><strong>Bracelet:</strong> ${data.bracelet}</p>
+        <p><strong>Movement:</strong> ${data.movement}</p>
+        <img src="${imagePath}" alt="Watch Image" style="max-width: 300px; margin-top: 20px;" />
+      `;
+    };
+    img.onerror = () => {
+      resultDiv.innerHTML = `
+        <p><strong>Reference:</strong> ${data.reference}</p>
+        <p><strong>Retail Price:</strong> ${data.retail_price}</p>
+        <p><strong>Collection:</strong> ${data.collection}</p>
+        <p><strong>Dial:</strong> ${data.dial}</p>
+        <p><strong>Dial Color:</strong> ${data.dial_color || 'N/A'}</p>
+        <p><strong>Case:</strong> ${data.case}</p>
+        <p><strong>Bracelet:</strong> ${data.bracelet}</p>
+        <p><strong>Movement:</strong> ${data.movement}</p>
+      `;
+    };
+  } catch (error) {
+    resultDiv.innerHTML = `<p>Error fetching data. Please try again later.</p>`;
+    console.error(error);
+  }
+}
 
-      const data = await response.json();
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('search').addEventListener('click', lookupReference);
 
-      let html = `<h3>Reference: ${data.reference}</h3>`;
-      if (data.retail_price) html += `<p><strong>Retail Price:</strong> ${data.retail_price}</p>`;
-      if (data.collection) html += `<p><strong>Collection:</strong> ${data.collection}</p>`;
-      if (data.dial) html += `<p><strong>Dial:</strong> ${data.dial}</p>`;
-      if (data.dial_color) html += `<p><strong>Dial Color:</strong> ${data.dial_color}</p>`;
-      if (data.case) html += `<p><strong>Case:</strong> ${data.case}</p>`;
-      if (data.bracelet) html += `<p><strong>Bracelet:</strong> ${data.bracelet}</p>`;
-      if (data.movement) html += `<p><strong>Movement:</strong> ${data.movement}</p>`;
-
-      const formattedRef = reference.replace(/[\/]/g, '-');
-      html += `<img src="images/${formattedRef}.avif" alt="Watch Image" class="watch-image" onerror="this.style.display='none';" />`;
-
-      resultDiv.innerHTML = html;
-    } catch (error) {
-      resultDiv.innerHTML = 'An error occurred while looking up the reference.';
-      console.error(error);
-    }
-  };
-
-  button.addEventListener('click', lookupReference);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+  document.getElementById('reference').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      console.log('Enter pressed, triggering lookup');
       lookupReference();
     }
   });
 });
-
