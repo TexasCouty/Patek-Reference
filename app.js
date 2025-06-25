@@ -16,7 +16,9 @@ function lookupReference() {
         return;
       }
 
-      const formatted = `
+      const refImg = data.reference.replace(/\//g, "-");
+
+      result.innerHTML = `
         <p><strong>Reference:</strong> ${data.reference}</p>
         <p><strong>Retail Price:</strong> ${data.retail_price}</p>
         <p><strong>Collection:</strong> ${data.collection}</p>
@@ -24,19 +26,8 @@ function lookupReference() {
         <p><strong>Case:</strong> ${data.case}</p>
         <p><strong>Bracelet:</strong> ${data.bracelet}</p>
         <p><strong>Movement:</strong> ${data.movement}</p>
+        <img src="images/${refImg}.avif" alt="${data.reference}" style="max-width:300px; margin-top:10px;" onerror="console.log('🖼️ Image not found: ${refImg}.avif')">
       `;
-
-      const refImg = ref.replace(/\//g, "-");
-      const img = document.createElement("img");
-      img.src = `images/${refImg}.avif`;
-      img.alt = `${ref}`;
-      img.onerror = () => console.log(`🖼️ Image not found for ${refImg}`);
-      img.style.maxWidth = "300px";
-      img.style.display = "block";
-      img.style.marginTop = "10px";
-
-      result.innerHTML = formatted;
-      result.appendChild(img);
     })
     .catch(err => {
       console.error("❌ Lookup error:", err);
@@ -102,6 +93,11 @@ function setupAdminButton() {
     form.appendChild(submit);
     resultDiv.appendChild(form);
   };
+}
+
+function goHome() {
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("refInput").value = "";
 }
 
 setupAdminButton();
