@@ -32,11 +32,8 @@ async function lookupReference() {
     if (match.movement) formatted += `<p><strong>Movement:</strong> ${match.movement}</p>`;
 
     if (match.reference) {
-      // Convert reference to safe image file name:
-      // "5160/500R-001" → "5160-500-001"
-      let safeRef = match.reference.replace(/\//g, "-"); // Replace slash with dash
-      safeRef = safeRef.replace(/[A-Z]-/, "-");          // Replace R-, G-, etc. with just -
-
+      // Only replace slashes with dashes, keep R/G/J etc.
+      let safeRef = match.reference.replace(/\//g, "-");
       const imgPath = `/images/${safeRef}.avif`;
 
       formatted += `
