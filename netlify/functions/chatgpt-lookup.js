@@ -39,7 +39,8 @@ exports.handler = async function (event) {
     // Ask each field separately for better accuracy
     const retail_price = await queryOpenAI(`What is the retail price of the Patek Philippe watch with reference number ${reference}? Provide only the price.`);
     const collection = await queryOpenAI(`Which collection does the Patek Philippe watch with reference number ${reference} belong to? Give just the name of the collection.`);
-    const dial = await queryOpenAI(`Please describe in rich detail the dial of the Patek Philippe watch with reference number ${reference}. Include its color, texture, pattern, markers, and any decorative techniques. Use official Patek specifications if known.`);
+    const dial = await queryOpenAI(`What is the dial like on the Patek Philippe watch with reference number ${reference}?`);
+    const dial_color = await queryOpenAI(`What is the color of the dial on the Patek Philippe watch with reference number ${reference}? Just give the color.`);
     const caseDesc = await queryOpenAI(`What is the case material and size of the Patek Philippe watch with reference number ${reference}?`);
     const bracelet = await queryOpenAI(`Describe the bracelet or strap of the Patek Philippe watch with reference number ${reference}.`);
     const movement = await queryOpenAI(`What is the movement used in the Patek Philippe watch with reference number ${reference}? Provide the caliber name and type.`);
@@ -49,6 +50,7 @@ exports.handler = async function (event) {
       retail_price,
       collection,
       dial,
+      dial_color,
       case: caseDesc,
       bracelet,
       movement
