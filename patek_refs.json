@@ -1,6 +1,7 @@
 [
   {
     "reference": "5711/1A",
+    "Collection": "Nautilus",
     "retail_price": "$34,893",
     "dial": "Blue",
     "case": "Steel",
@@ -9,6 +10,7 @@
   },
   {
     "reference": "5167A",
+    "Collection": "Aquanat",
     "retail_price": "$21,650",
     "dial": "Black",
     "case": "Steel",
