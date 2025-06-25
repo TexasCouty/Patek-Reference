@@ -23,10 +23,16 @@ async function lookupReference() {
     const data = await response.json();
     console.log("✅ Server response:", data);
 
-    resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    // Format output like raw JSON fields (no braces or indent)
+    let formatted = "";
+    for (const [key, value] of Object.entries(data)) {
+      formatted += `"${key}": "${value}",\n`;
+    }
+    resultDiv.innerHTML = `<pre>${formatted.trim().replace(/,$/, "")}</pre>`;
 
   } catch (err) {
     console.error("❌ Lookup failed:", err);
     resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
   }
 }
+
