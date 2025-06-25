@@ -1,30 +1,5 @@
 const fetch = require('node-fetch');
 
-async function askOpenAI(prompt) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: "You are a Patek Philippe reference expert. Provide short, accurate, structured answers." },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.2
-    })
-  });
-
-  const data = await response.json();
-  if (!data.choices || !data.choices[0]?.message?.content) {
-    throw new Error("Invalid OpenAI response.");
-  }
-
-  return data.choices[0].message.content.trim();
-}
-
 exports.handler = async function (event) {
   console.log("⚡️ Function triggered");
 
@@ -33,36 +8,57 @@ exports.handler = async function (event) {
     const { reference } = JSON.parse(event.body);
     console.log("🔍 Parsed reference:", reference);
 
-    const prompts = {
-      retail_price: `What is the retail price of the Patek Philippe watch with reference ${reference}? Provide only the price in USD or CHF.`,
-      collection: `What is the collection name for Patek Philippe reference ${reference}? Example: Nautilus, Aquanaut, Complications, Grand Complications.`,
-      dial: `What is the dial description for the Patek Philippe reference ${reference}? Include color, style, and numerals. Return one descriptive sentence.`,
-      case: `What is the case material and size of the Patek Philippe watch with reference ${reference}?`,
-      bracelet: `What type of bracelet or strap is used in the Patek Philippe reference ${reference}? Include material and clasp type.`,
-      movement: `What movement caliber is used in the Patek Philippe reference ${reference}? Provide full caliber name.`
+    const model = "gpt-4o";
+    const temperature = 0.2;
+
+    // Helper to query OpenAI for a single field
+    const queryOpenAI = async (question) => {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: "You are a watch expert who provides concise but accurate answers." },
+            { role: "user", content: question }
+          ],
+          temperature
+        })
+      });
+
+      const data = await response.json();
+      console.log(`📩 GPT Response for "${question}":`, data);
+
+      const content = data.choices?.[0]?.message?.content?.trim();
+      return content || "Unavailable";
     };
 
-    const results = {};
-    for (const [field, prompt] of Object.entries(prompts)) {
-      console.log(`🧠 Asking for ${field}:`, prompt);
-      results[field] = await askOpenAI(prompt);
-    }
+    // Ask each field separately
+    const retail_price = await queryOpenAI(`What is the retail price of the Patek Philippe reference ${reference}?`);
+    const collection = await queryOpenAI(`What collection does the Patek Philippe reference ${reference} belong to?`);
+    const dial = await queryOpenAI(`Describe the dial of the Patek Philippe reference ${reference}, including color, material, and decoration style.`);
+    const caseType = await queryOpenAI(`What is the case of the Patek Philippe reference ${reference}, including material and size?`);
+    const bracelet = await queryOpenAI(`What type of bracelet or strap does the Patek Philippe reference ${reference} have?`);
+    const movement = await queryOpenAI(`What is the movement used in the Patek Philippe reference ${reference}?`);
 
-    const jsonOutput = {
+    const result = {
       reference,
-      retail_price: results.retail_price,
-      collection: results.collection,
-      dial: results.dial,
-      case: results.case,
-      bracelet: results.bracelet,
-      movement: results.movement
+      retail_price,
+      collection,
+      dial,
+      case: caseType,
+      bracelet,
+      movement
     };
 
-    console.log("✅ Final compiled result:", jsonOutput);
+    console.log("✅ Final result:", result);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(jsonOutput)
+      body: JSON.stringify(result)
     };
 
   } catch (err) {
