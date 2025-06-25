@@ -3,13 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <title>Patek Philippe Reference Lookup</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .json-output {
+      font-family: monospace;
+      font-size: 18px;
+      line-height: 1.8;
+      background-color: #f9f9f9;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      text-align: left;
+    }
+    img {
+      max-width: 300px;
+      display: block;
+      margin: 20px auto 0;
+    }
+  </style>
 </head>
 <body>
   <h1>Patek Philippe Reference Lookup</h1>
-  <input type="text" id="refInput" placeholder="Enter Reference Number">
+
+  <input type="text" id="refInput" placeholder="Enter Reference Number" />
   <button onclick="lookupReference()">Search</button>
-  <div id="result"></div>
+
+  <div id="result"><div class="json-output">Awaiting input...</div></div>
+
   <script src="app.js"></script>
 </body>
 </html>
