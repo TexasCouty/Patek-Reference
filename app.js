@@ -19,7 +19,7 @@ async function lookupReference() {
     }
 
     const match = await response.json();
-    console.log("Match object:", match); // helpful for debugging
+    console.log("Match object:", match);
 
     let formatted = "";
 
@@ -31,10 +31,21 @@ async function lookupReference() {
     if (match.bracelet) formatted += `<p><strong>Bracelet:</strong> ${match.bracelet}</p>`;
     if (match.movement) formatted += `<p><strong>Movement:</strong> ${match.movement}</p>`;
 
-    resultDiv.innerHTML = `<div class="json-output">${formatted}</div>`;
+    // Add image after all details (same layout format)
+    if (match.reference) {
+      const safeRef = match.reference.replace(/\//g, "_");
+      const imgPath = `/images/${safeRef}.avif`;
+
+      formatted += `
+        <img src="${imgPath}" alt="Watch Image"
+             style="max-width:300px; margin-top:20px;"
+             onerror="this.onerror=null;this.src='/images/placeholder.avif';" />
+      `;
+    }
+
+    resultDiv.innerHTML = formatted;
   } catch (err) {
     console.error("Lookup failed:", err);
     resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
   }
 }
-
