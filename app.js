@@ -19,7 +19,7 @@ async function lookupReference() {
     }
 
     const match = await response.json();
-    console.log("Match object:", match);
+    console.log("Match object:", match); // helpful for debugging
 
     let formatted = "";
 
@@ -30,18 +30,6 @@ async function lookupReference() {
     if (match.case) formatted += `<p><strong>Case:</strong> ${match.case}</p>`;
     if (match.bracelet) formatted += `<p><strong>Bracelet:</strong> ${match.bracelet}</p>`;
     if (match.movement) formatted += `<p><strong>Movement:</strong> ${match.movement}</p>`;
-
-    // Add watch image if reference exists
-    if (match.reference) {
-      const safeRef = match.reference.replace(/\//g, "_");
-      const imgPath = `/images/${safeRef}.avif`;
-
-      formatted += `
-        <img src="${imgPath}" alt="Watch Image" 
-             style="max-width:300px; margin-top:20px;" 
-             onerror="this.onerror=null;this.src='/images/placeholder.avif';" />
-      `;
-    }
 
     resultDiv.innerHTML = `<div class="json-output">${formatted}</div>`;
   } catch (err) {
