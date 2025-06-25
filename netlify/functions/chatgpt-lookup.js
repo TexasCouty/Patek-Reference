@@ -8,49 +8,62 @@ exports.handler = async function (event) {
     const { reference } = JSON.parse(event.body);
     console.log("🔍 Parsed reference:", reference);
 
-    const prompt = `You are an expert on luxury watches. Return only valid JSON (no markdown or extra text) about this Patek Philippe reference: ${reference}. Each field must be accurate and based on real data. If you're not sure, return "Unknown". Format:
+    const fields = {
+      reference: reference, // direct
+      retail_price: "",
+      collection: "",
+      dial: "",
+      case: "",
+      bracelet: "",
+      movement: ""
+    };
 
-{
-  "reference": "...",
-  "retail_price": "...",
-  "collection": "...",
-  "dial": "...",
-  "case": "...",
-  "bracelet": "...",
-  "movement": "..."
-}`;
+    const questions = {
+      retail_price: `What is the retail price of Patek Philippe reference ${reference}? Return only the price.`,
+      collection: `What collection does the Patek Philippe reference ${reference} belong to? Return a short name like 'Nautilus', 'Complications', etc.`,
+      dial: `What is the dial description of Patek Philippe reference ${reference}? Keep it concise.`,
+      case: `What is the case description of Patek Philippe reference ${reference}?`,
+      bracelet: `What is the bracelet or strap description of Patek Philippe reference ${reference}?`,
+      movement: `What is the movement of Patek Philippe reference ${reference}?`
+    };
 
-    console.log("📤 Prompt to OpenAI:", prompt);
+    for (const key of Object.keys(questions)) {
+      const question = questions[key];
 
-    const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.2
-      })
-    });
+      console.log(`📤 Asking OpenAI for ${key}:`, question);
 
-    const data = await openaiResponse.json();
-    console.log("🤖 OpenAI raw response:", data);
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "You are a luxury watch expert. Respond as concisely and accurately as possible." },
+            { role: "user", content: question }
+          ],
+          temperature: 0.2
+        })
+      });
 
-    if (!data.choices || !data.choices[0]?.message?.content) {
-      throw new Error("Invalid response from OpenAI.");
+      const data = await response.json();
+      console.log(`🤖 GPT response for ${key}:`, data);
+
+      const content = data.choices?.[0]?.message?.content?.trim();
+      if (!content) {
+        throw new Error(`Missing response for ${key}`);
+      }
+
+      fields[key] = content;
     }
 
-    const jsonOutput = JSON.parse(data.choices[0].message.content);
-    console.log("✅ Parsed JSON output:", jsonOutput);
+    console.log("✅ Final output:", fields);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(jsonOutput)
+      body: JSON.stringify(fields)
     };
 
   } catch (err) {
