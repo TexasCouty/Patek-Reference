@@ -2,7 +2,7 @@
   {
     "reference": "5711/1A",
     "retail_price": "$34,893",
-    "Collection": "Nautilus",
+    "collection": "Nautilus",
     "dial": "Blue",
     "case": "Steel",
     "bracelet": "Steel",
@@ -11,7 +11,7 @@
   {
     "reference": "5167A",
     "retail_price": "$21,650",
-    "Collection": "Aquanat",
+    "collection": "Aquanaut",
     "dial": "Black",
     "case": "Steel",
     "bracelet": "Rubber",
