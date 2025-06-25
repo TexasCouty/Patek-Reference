@@ -22,9 +22,9 @@ async function lookupReference() {
 
     let formatted = "";
     for (const [key, value] of Object.entries(match)) {
-      formatted += `"${key}": "${value}",\n`;
+      formatted += `<div><strong>${key}:</strong> ${value}</div>`;
     }
-    resultDiv.innerHTML = `<pre>${formatted.trim().replace(/,$/, "")}</pre>`;
+    resultDiv.innerHTML = `<div class="json-output">${formatted}</div>`;
   } catch (err) {
     console.error("Lookup failed:", err);
     resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;

@@ -15,11 +15,17 @@
       padding: 8px;
       margin-right: 5px;
     }
-    pre {
-      background-color: #f4f4f4;
-      padding: 10px;
-      border-radius: 5px;
+    .json-output {
+      font-family: monospace;
+      font-size: 18px;
+      line-height: 1.6;
+      background-color: #f9f9f9;
+      padding: 16px;
+      border-radius: 8px;
       margin-top: 20px;
+    }
+    strong {
+      color: #333;
     }
   </style>
 </head>
@@ -29,8 +35,9 @@
   <input id="refInput" type="text" placeholder="Enter Reference (e.g., 5711/1A)">
   <button onclick="lookupReference()">Search</button>
 
-  <div id="result"><pre>Awaiting input...</pre></div>
+  <div id="result"><div class="json-output">Awaiting input...</div></div>
 
   <script src="app.js"></script>
 </body>
 </html>
+

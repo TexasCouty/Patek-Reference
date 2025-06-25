@@ -1,0 +1,23 @@
+{
+  "name": "patek-reference",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TexasCouty/Patek-Reference.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TexasCouty/Patek-Reference/issues"
+  },
+  "homepage": "https://github.com/TexasCouty/Patek-Reference#readme",
+  "description": "",
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}

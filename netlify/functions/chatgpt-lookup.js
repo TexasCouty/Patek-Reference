@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
-export async function handler(event) {
+exports.handler = async function (event) {
   console.log("Function triggered");
 
   try {
@@ -44,6 +44,7 @@ export async function handler(event) {
     }
 
     const jsonOutput = JSON.parse(data.choices[0].message.content);
+
     return {
       statusCode: 200,
       body: JSON.stringify(jsonOutput)
@@ -56,4 +57,4 @@ export async function handler(event) {
       body: JSON.stringify({ error: err.message })
     };
   }
-}
+};
