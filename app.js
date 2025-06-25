@@ -44,68 +44,64 @@ function lookupReference() {
     });
 }
 
-function goHome() {
-  document.getElementById("result").innerHTML = "";
-  document.getElementById("refInput").value = "";
-}
+function setupAdminButton() {
+  const adminBtn = document.getElementById("adminBtn");
 
-const adminBtn = document.createElement("button");
-adminBtn.textContent = "Admin Update";
-adminBtn.onclick = () => {
-  const resultDiv = document.getElementById("result");
-  resultDiv.innerHTML = "";
+  adminBtn.onclick = () => {
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = "";
 
-  const form = document.createElement("div");
+    const form = document.createElement("div");
 
-  const refInput = document.createElement("input");
-  refInput.placeholder = "Reference Number";
-  form.appendChild(refInput);
+    const refInput = document.createElement("input");
+    refInput.placeholder = "Reference Number";
+    form.appendChild(refInput);
 
-  const priceInput = document.createElement("input");
-  priceInput.placeholder = "Retail Price";
-  form.appendChild(priceInput);
+    const priceInput = document.createElement("input");
+    priceInput.placeholder = "Retail Price";
+    form.appendChild(priceInput);
 
-  const submit = document.createElement("button");
-  submit.textContent = "Update";
+    const submit = document.createElement("button");
+    submit.textContent = "Update";
 
-  submit.onclick = () => {
-    const reference = refInput.value.trim();
-    const price = priceInput.value.trim();
+    submit.onclick = () => {
+      const reference = refInput.value.trim();
+      const price = priceInput.value.trim();
 
-    if (!reference || !price) {
-      alert("Please provide both reference and retail price.");
-      return;
-    }
+      if (!reference || !price) {
+        alert("Please provide both reference and retail price.");
+        return;
+      }
 
-    const updateData = {
-      reference: reference,
-      retail_price: price
+      const updateData = {
+        reference: reference,
+        retail_price: price
+      };
+
+      fetch("/.netlify/functions/admin-update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updateData)
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log("✅ Admin update response:", data);
+          alert("Update successful!");
+
+          document.getElementById("refInput").value = reference;
+          lookupReference();
+        })
+        .catch(err => {
+          console.error("❌ Admin update error:", err);
+          alert("Update failed.");
+        });
     };
 
-    fetch("/.netlify/functions/admin-update", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(updateData)
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log("✅ Admin update response:", data);
-        alert("Update successful!");
-
-        document.getElementById("refInput").value = reference;
-        lookupReference();
-      })
-      .catch(err => {
-        console.error("❌ Admin update error:", err);
-        alert("Update failed.");
-      });
+    form.appendChild(submit);
+    resultDiv.appendChild(form);
   };
+}
 
-  form.appendChild(submit);
-  resultDiv.appendChild(form);
-};
-
-document.body.appendChild(adminBtn);
-
+setupAdminButton();

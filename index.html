@@ -3,29 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <title>Patek Philippe Reference Lookup</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>
-    <img src="/images/logo.jpeg" class="logo" alt="Logo" onclick="goHome()">
-    Patek Philippe Reference Lookup
-    <img src="/images/logo.jpeg" class="logo" alt="Logo" onclick="goHome()">
-  </h1>
+  <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+    <a href="https://www.patek.com" target="_blank">
+      <img src="images/logo.jpeg" alt="Logo" style="height: 40px;">
+    </a>
+    <h1>Patek Philippe Reference Lookup</h1>
+    <a href="https://www.patek.com" target="_blank">
+      <img src="images/logo.jpeg" alt="Logo" style="height: 40px;">
+    </a>
+  </div>
 
   <input type="text" id="refInput" placeholder="Enter Reference Number">
   <button onclick="lookupReference()">Search</button>
-  <button onclick="toggleAdmin()">Admin</button>
+  <button id="adminBtn">Admin Update</button>
 
   <div id="result"></div>
-
-  <div id="adminPanel" style="display:none; margin-top:30px;">
-    <h2>Admin Panel</h2>
-    <input type="text" id="adminRef" placeholder="Reference Number"><br>
-    <input type="text" id="adminPrice" placeholder="Retail Price"><br>
-    <input type="file" id="adminImage"><br>
-    <button onclick="submitAdminUpdate()">Update</button>
-    <div id="adminMsg"></div>
-  </div>
 
   <script src="app.js"></script>
 </body>
