@@ -2,10 +2,8 @@ async function lookupReference() {
   const ref = document.getElementById('refInput').value.trim();
   const resultDiv = document.getElementById('result');
 
-  console.log(`🔍 Lookup triggered for: ${ref}`);
-
   if (!ref) {
-    resultDiv.innerHTML = `<p>Please enter a valid reference.</p>`;
+    resultDiv.innerHTML = "<p>Please enter a valid reference number.</p>";
     return;
   }
 
@@ -20,19 +18,15 @@ async function lookupReference() {
       throw new Error(`Server returned ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log("✅ Server response:", data);
+    const match = await response.json();
 
-    // Format output like raw JSON fields (no braces or indent)
     let formatted = "";
-    for (const [key, value] of Object.entries(data)) {
+    for (const [key, value] of Object.entries(match)) {
       formatted += `"${key}": "${value}",\n`;
     }
     resultDiv.innerHTML = `<pre>${formatted.trim().replace(/,$/, "")}</pre>`;
-
   } catch (err) {
-    console.error("❌ Lookup failed:", err);
+    console.error("Lookup failed:", err);
     resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
   }
 }
-

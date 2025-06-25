@@ -1,7 +1,0 @@
-{
-  "type": "module",
-  "dependencies": {
-    "mongodb": "^5.9.2",
-    "openai": "^4.25.0"
-  }
-}

@@ -3,11 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <title>Patek Lookup</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 8px;
+      margin-right: 5px;
+    }
+    pre {
+      background-color: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <input id="refInput" placeholder="Enter Reference">
+  <h1>🔍 Patek Philippe Reference Lookup</h1>
+
+  <input id="refInput" type="text" placeholder="Enter Reference (e.g., 5711/1A)">
   <button onclick="lookupReference()">Search</button>
-  <div id="result"></div>
+
+  <div id="result"><pre>Awaiting input...</pre></div>
+
   <script src="app.js"></script>
 </body>
 </html>
