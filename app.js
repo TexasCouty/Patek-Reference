@@ -1,40 +1,59 @@
-function displayResult(data) {
-  const resultDiv = document.getElementById("result");
-  console.log("🧹 Clearing result div...");
-  resultDiv.innerHTML = "";
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("refInput");
 
-  const ref = data.reference;
-  const normalizedRef = ref.replace(/\//g, "-");
-  const imagePath = `images/${normalizedRef}.avif`;
+  // Trigger lookup when Enter is pressed
+  input.addEventListener("keydown", function (e) {
+    console.log("Key pressed:", e.key);
+    if (e.key === "Enter") {
+      console.log("Enter pressed, triggering lookup");
+      lookupReference();
+    }
+  });
+});
 
-  console.log("📝 Building HTML content...");
-  const content = `
-    <p><strong>Reference:</strong> ${ref}</p>
-    <p><strong>Retail Price:</strong> ${data.retail_price}</p>
-    <p><strong>Collection:</strong> ${data.collection}</p>
-    <p><strong>Dial:</strong> ${data.dial}</p>
-    <p><strong>Case:</strong> ${data.case}</p>
-    <p><strong>Bracelet:</strong> ${data.bracelet}</p>
-    <p><strong>Movement:</strong> ${data.movement}</p>
-  `;
+async function lookupReference() {
+  const ref = document.getElementById("refInput").value.trim();
+  if (!ref) return;
 
-  resultDiv.insertAdjacentHTML("beforeend", content);
-  console.log("✅ Inserted text content");
+  console.log("Looking up reference:", ref);
 
-  const image = document.createElement("img");
-  image.src = imagePath;
-  image.alt = `Watch image for ${ref}`;
-  image.className = "watch-image";
+  try {
+    const response = await fetch("/.netlify/functions/chatgpt-lookup", {
+      method: "POST",
+      body: JSON.stringify({ reference: ref })
+    });
 
-  image.onload = () => {
-    console.log(`🖼️ Image loaded successfully: ${image.src}`);
-  };
+    const data = await response.json();
+    console.log("API Response:", data);
 
-  image.onerror = () => {
-    console.warn(`⚠️ Image not found: ${image.src}`);
-    image.style.display = "none";
-  };
+    if (data.error) {
+      document.getElementById("result").innerHTML = `<p>Error: ${data.error}</p>`;
+      return;
+    }
 
-  resultDiv.appendChild(image);
-  console.log("✅ Appended image to result div");
+    // Format image file name
+    const refFormatted = data.reference.replace(/\//g, "-");
+    const imagePath = `images/${refFormatted}.avif`;
+    console.log("Image path:", imagePath);
+
+    const html = `
+      <p><strong>Reference:</strong> ${data.reference}</p>
+      <p><strong>Retail Price:</strong> ${data.retail_price}</p>
+      <p><strong>Collection:</strong> ${data.collection}</p>
+      <p><strong>Dial:</strong> ${data.dial}</p>
+      <p><strong>Case:</strong> ${data.case}</p>
+      <p><strong>Bracelet:</strong> ${data.bracelet}</p>
+      <p><strong>Movement:</strong> ${data.movement}</p>
+      <img src="${imagePath}" alt="Watch Image" class="watch-image" onerror="this.style.display='none'; console.warn('🖼️ Image not found:', this.src);">
+    `;
+
+    document.getElementById("result").innerHTML = html;
+
+  } catch (err) {
+    console.error("Lookup failed:", err);
+    document.getElementById("result").innerHTML = `<p>Error: ${err.message}</p>`;
+  }
 }
+
+// ✅ Expose function to HTML onclick
+window.lookupReference = lookupReference;
