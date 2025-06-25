@@ -1,3 +1,16 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("refInput");
+  const resultDiv = document.getElementById("result");
+
+  input.addEventListener("keydown", function (e) {
+    console.log("Key pressed:", e.key);
+    if (e.key === "Enter") {
+      console.log("Enter pressed, triggering lookup");
+      lookupReference();
+    }
+  });
+});
+
 async function lookupReference() {
   const refInput = document.getElementById("refInput");
   const reference = refInput.value.trim();
@@ -52,9 +65,3 @@ function displayResult(data) {
   resultDiv.insertAdjacentHTML("beforeend", content);
 }
 
-// 🔑 NEW: Trigger search when Enter is pressed
-document.getElementById("refInput").addEventListener("keydown", function (e) {
-  if (e.key === "Enter") {
-    lookupReference();
-  }
-});
