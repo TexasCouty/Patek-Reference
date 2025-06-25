@@ -35,3 +35,11 @@ button {
 .logo:hover {
   transform: scale(1.1);
 }
+
+/* ✅ Add this to resize the watch image */
+.watch-image {
+  max-width: 300px;
+  height: auto;
+  display: block;
+  margin: 10px auto 0;
+}
