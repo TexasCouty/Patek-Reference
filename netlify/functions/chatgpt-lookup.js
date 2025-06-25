@@ -38,10 +38,9 @@ exports.handler = async function (event) {
     });
 
     const data = await openaiResponse.json();
-    console.log("🤖 OpenAI raw response:", JSON.stringify(data, null, 2));
+    console.log("🤖 OpenAI raw response:", data);
 
     if (!data.choices || !data.choices[0]?.message?.content) {
-      console.warn("⚠️ OpenAI returned no choices or content.");
       throw new Error("Invalid response from OpenAI.");
     }
 
@@ -61,4 +60,3 @@ exports.handler = async function (event) {
     };
   }
 };
-

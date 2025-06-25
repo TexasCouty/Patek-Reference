@@ -6,16 +6,18 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-    <img src="images/patek-logo-gold.jpeg" alt="Patek Logo" style="height: 40px; cursor: pointer;" onclick="goHome()">
+  <div class="logo-bar">
+    <a href="/" class="logo-link">
+      <img src="images/patek-logo-gold.jpeg" alt="Patek Philippe Logo" class="logo">
+    </a>
     <h1>Patek Philippe Reference Lookup</h1>
-    <img src="images/patek-logo-gold.jpeg" alt="Patek Logo" style="height: 40px; cursor: pointer;" onclick="goHome()">
+    <a href="/" class="logo-link">
+      <img src="images/patek-logo-gold.jpeg" alt="Patek Philippe Logo" class="logo">
+    </a>
   </div>
 
   <input type="text" id="refInput" placeholder="Enter Reference Number">
   <button onclick="lookupReference()">Search</button>
-  <button id="adminBtn">Admin Update</button>
-
   <div id="result"></div>
 
   <script src="app.js"></script>
