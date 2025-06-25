@@ -8,15 +8,16 @@ exports.handler = async function (event) {
     const { reference } = JSON.parse(event.body);
     console.log("🔍 Parsed reference:", reference);
 
-    const prompt = `Provide ONLY raw JSON (no markdown) with these fields for Patek Philippe reference number ${reference}:
+    const prompt = `You are an expert on luxury watches. Return only valid JSON (no markdown or extra text) about this Patek Philippe reference: ${reference}. Each field must be accurate and based on real data. If you're not sure, return "Unknown". Format:
+
 {
-  "reference": "",
-  "retail_price": "",
-  "collection": "",
-  "dial": "",
-  "case": "",
-  "bracelet": "",
-  "movement": ""
+  "reference": "...",
+  "retail_price": "...",
+  "collection": "...",
+  "dial": "...",
+  "case": "...",
+  "bracelet": "...",
+  "movement": "..."
 }`;
 
     console.log("📤 Prompt to OpenAI:", prompt);
