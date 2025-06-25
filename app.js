@@ -31,7 +31,6 @@ async function lookupReference() {
     if (match.bracelet) formatted += `<p><strong>Bracelet:</strong> ${match.bracelet}</p>`;
     if (match.movement) formatted += `<p><strong>Movement:</strong> ${match.movement}</p>`;
 
-    // Add image with error logging
     if (match.reference) {
       const safeRef = match.reference.replace(/\//g, "_");
       const imgPath = `/images/${safeRef}.avif`;
@@ -49,3 +48,4 @@ async function lookupReference() {
     resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
   }
 }
+
