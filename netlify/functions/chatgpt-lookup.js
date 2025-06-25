@@ -63,4 +63,3 @@ Answer for ${reference} only in this short JSON style. If no real image exists, 
     };
   }
 }
-
