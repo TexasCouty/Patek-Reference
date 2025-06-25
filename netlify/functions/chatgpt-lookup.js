@@ -1,82 +1,65 @@
-import { MongoClient } from "mongodb";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-const MONGODB_URI = process.env.MONGODB_URI;
-
 export async function handler(event) {
-  console.log(`[${new Date().toISOString()}] 🔵 Lambda STARTED ----------------------------`);
+  console.log("Function triggered");
 
   try {
-    const { reference } = JSON.parse(event.body || '{}');
-    console.log(`[${new Date().toISOString()}] 📌 Parsed reference: ${reference}`);
+    console.log("Raw event body:", event.body);
 
-    console.log(`[${new Date().toISOString()}] ⏳ Connecting to MongoDB...`);
-    const client = new MongoClient(MONGODB_URI);
-    await client.connect();
-    const db = client.db();
-    const collection = db.collection("watches");
+    const { reference } = JSON.parse(event.body);
+    console.log("Parsed reference:", reference);
 
-    console.log(`[${new Date().toISOString()}] ⏳ Searching MongoDB for: ${reference}`);
-    const found = await collection.findOne({ reference: reference });
+    const prompt = `Provide ONLY raw JSON, no markdown, for Patek Philippe reference ${reference} in this concise style:
+{
+  "Reference Number": "...",
+  "Retail Price": "...",
+  "Collection": "short name like 'Nautilus' or 'Aquanaut'",
+  "Dial": "...",
+  "Case": "...",
+  "Bracelet": "...",
+  "Movement": "..."
+}
+Example:
+{
+  "Reference Number": "5711/1A",
+  "Retail Price": "$34,893",
+  "Collection": "Nautilus",
+  "Dial": "Blue",
+  "Case": "Steel",
+  "Bracelet": "Steel",
+  "Movement": "Caliber 26‑330 S C"
+}
+Answer for ${reference} in this JSON format only. No extra text.`;
 
-    if (found) {
-      console.log(`[${new Date().toISOString()}] ✅ Found in DB: ${JSON.stringify(found)}`);
-      await client.close();
-      return {
-        statusCode: 200,
-        body: JSON.stringify(found)
-      };
-    }
+    console.log("Prompt to OpenAI:", prompt);
 
-    console.log(`[${new Date().toISOString()}] ❌ Reference ${reference} not found in DB. Asking OpenAI...`);
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "Reply ONLY with raw JSON for the requested watch reference, no markdown, no text."
-        },
-        {
-          role: "user",
-          content: `Provide detailed JSON for Patek Philippe reference ${reference}.`
-        }
-      ]
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+      }),
     });
 
-    let raw = completion.choices[0].message.content;
-    console.log(`[${new Date().toISOString()}] ✅ Raw OpenAI response: ${raw}`);
+    console.log("OpenAI API status:", response.status);
 
-    // ✅ Clean code block if exists
-    raw = raw.trim();
-    if (raw.startsWith("```")) {
-      raw = raw.replace(/```[\s\S]*?(\{[\s\S]*\})[\s\S]*?```/, '$1');
-    }
+    const data = await response.json();
+    console.log("OpenAI raw response:", JSON.stringify(data));
 
-    // ✅ Parse cleaned JSON
-    const parsed = JSON.parse(raw);
-    console.log(`[${new Date().toISOString()}] ✅ Cleaned & parsed JSON: ${JSON.stringify(parsed)}`);
+    const answer = data.choices[0].message.content.trim();
+    console.log("Extracted answer:", answer);
 
-    // ✅ Save to MongoDB
-    await collection.insertOne(parsed);
-    console.log(`[${new Date().toISOString()}] ✅ Saved ${reference} to MongoDB.`);
-
-    await client.close();
     return {
       statusCode: 200,
-      body: JSON.stringify(parsed)
+      body: JSON.stringify({ answer }),
     };
-
-  } catch (err) {
-    console.error(`[${new Date().toISOString()}] ❌ Handler error:`, err);
+  } catch (error) {
+    console.error("Error in function:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: error.toString() }),
     };
   }
 }
-
