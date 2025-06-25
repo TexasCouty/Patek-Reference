@@ -1,60 +1,66 @@
-const fetch = require('node-fetch');
-
-exports.handler = async function (event) {
+export async function handler(event) {
   console.log("Function triggered");
 
   try {
     console.log("Raw event body:", event.body);
+
     const { reference } = JSON.parse(event.body);
     console.log("Parsed reference:", reference);
 
-    const prompt = `Provide ONLY raw JSON (no markdown) with these fields for Patek Philippe reference number ${reference}:
+    const prompt = `Provide ONLY raw JSON, no code block or markdown, for Patek Philippe reference number ${reference} in this concise style:
 {
-  "reference": "",
-  "retail_price": "",
-  "dial": "",
-  "case": "",
-  "bracelet": "",
-  "movement": ""
-}`;
+  "Reference Number": "exact reference",
+  "Retail Price": "short dollar amount",
+  "Dial": "short phrase like 'Blue'",
+  "Case": "one word like 'Steel'",
+  "Bracelet": "same short format",
+  "Movement": "short caliber only",
+  "Image URL": "realistic public image URL for this reference or a placeholder like 'https://www.patek.com/img/watch_placeholder.jpg' if unavailable"
+}
+Example for style:
+{
+  "Reference Number": "5711/1A",
+  "Retail Price": "$34,893",
+  "Dial": "Blue",
+  "Case": "Steel",
+  "Bracelet": "Steel",
+  "Movement": "Caliber 26‑330 S C",
+  "Image URL": "https://www.patek.com/img/5711_1A.jpg"
+}
+Answer for ${reference} only in this short JSON style. If no real image exists, provide a placeholder link. No other text.`;
 
     console.log("Prompt to OpenAI:", prompt);
 
-    const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.2
-      })
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+      }),
     });
 
-    const data = await openaiResponse.json();
-    console.log("OpenAI raw response:", data);
+    console.log("OpenAI API status:", response.status);
 
-    if (!data.choices || !data.choices[0]?.message?.content) {
-      throw new Error("Invalid response from OpenAI.");
-    }
+    const data = await response.json();
+    console.log("OpenAI raw response:", JSON.stringify(data));
 
-    const jsonOutput = JSON.parse(data.choices[0].message.content);
+    const answer = data.choices[0].message.content.trim();
+    console.log("Extracted answer:", answer);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(jsonOutput)
+      body: JSON.stringify({ answer }),
     };
-
-  } catch (err) {
-    console.error("Function error:", err);
+  } catch (error) {
+    console.error("Error in function:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: error.toString() }),
     };
   }
-};
+}
+
