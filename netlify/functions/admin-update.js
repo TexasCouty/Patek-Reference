@@ -1,18 +1,21 @@
 const fs = require('fs');
 const path = require('path');
-const multiparty = require('multiparty');
+const formidable = require('formidable');
 
-exports.handler = async function (event) {
+exports.handler = async function (event, context) {
   console.log("⚡️ Admin function triggered");
   console.log("🧪 Method:", event.httpMethod);
 
   if (event.httpMethod !== 'POST') {
-    console.log("❌ Invalid method");
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   return new Promise((resolve, reject) => {
-    const form = new multiparty.Form();
+    const form = formidable({
+      multiples: false,
+      uploadDir: '/tmp', // Netlify writable temp dir
+      keepExtensions: true
+    });
 
     form.parse(event, async (err, fields, files) => {
       if (err) {
@@ -20,19 +23,15 @@ exports.handler = async function (event) {
         return resolve({ statusCode: 400, body: JSON.stringify({ error: 'Invalid form data' }) });
       }
 
-      console.log("✅ Parsed fields:", fields);
-      console.log("🖼️ Parsed files:", files);
-
-      const reference = fields.reference?.[0];
-      const retail_price = fields.retail_price?.[0];
-      const imageFile = files.image?.[0];
+      const reference = fields.reference;
+      const retail_price = fields.retail_price;
+      const imageFile = files.image;
 
       console.log("🔢 Reference:", reference);
       console.log("💰 Retail Price:", retail_price);
       console.log("📸 Image file object:", imageFile);
 
       if (!reference || !retail_price) {
-        console.log("❗ Missing reference or retail price");
         return resolve({ statusCode: 400, body: JSON.stringify({ error: 'Missing fields' }) });
       }
 
@@ -56,7 +55,7 @@ exports.handler = async function (event) {
         if (imageFile) {
           const safeRef = reference.replace(/\//g, '-');
           const destPath = path.resolve(__dirname, `../../images/${safeRef}.avif`);
-          fs.copyFileSync(imageFile.path, destPath);
+          fs.copyFileSync(imageFile.filepath, destPath);
           console.log(`📁 Image saved to: ${destPath}`);
         }
 
