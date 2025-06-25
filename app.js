@@ -42,15 +42,6 @@ function displayResult(data) {
   const normalizedRef = ref.replace(/\//g, "-");
   const imagePath = `images/${normalizedRef}.avif`;
 
-  const image = document.createElement("img");
-  image.src = imagePath;
-  image.alt = `Watch image for ${ref}`;
-  image.className = "watch-image";
-  image.onerror = () => {
-    console.warn(`🖼️ Image not found: ${imagePath}`);
-    image.style.display = "none";
-  };
-
   const content = `
     <p><strong>Reference:</strong> ${ref}</p>
     <p><strong>Retail Price:</strong> ${data.retail_price}</p>
@@ -61,7 +52,16 @@ function displayResult(data) {
     <p><strong>Movement:</strong> ${data.movement}</p>
   `;
 
-  resultDiv.appendChild(image);
   resultDiv.insertAdjacentHTML("beforeend", content);
-}
 
+  const image = document.createElement("img");
+  image.src = imagePath;
+  image.alt = `Watch image for ${ref}`;
+  image.className = "watch-image";
+  image.onerror = () => {
+    console.warn(`🖼️ Image not found: ${imagePath}`);
+    image.style.display = "none";
+  };
+
+  resultDiv.appendChild(image);
+}
