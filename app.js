@@ -1,3 +1,5 @@
+// ✅ File: /app.js
+
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("refInput");
 
@@ -75,7 +77,13 @@ async function getImagePath(refFormatted) {
         });
 
         const data = await res.json();
+
+        if (!data.imageUrl) {
+          throw new Error(data.error || "No image URL returned");
+        }
+
         return resolve({ src: data.imageUrl, source: 'chatgpt' });
+
       } catch (err) {
         console.error("Fallback image fetch failed:", err);
         return resolve({ src: '', source: 'none' });
