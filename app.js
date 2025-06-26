@@ -34,7 +34,6 @@ async function lookupReference() {
       return;
     }
 
-    // Get image path from local or fallback
     const refFormatted = data.reference.replace(/\//g, "-");
     const imageInfo = await getImagePath(refFormatted);
 
@@ -78,14 +77,15 @@ async function getImagePath(refFormatted) {
 
         const data = await res.json();
 
-        if (!data.imageUrl) {
-          throw new Error(data.error || "No image URL returned");
+        if (data.error || !data.imageUrl) {
+          console.error("🚫 Fallback failed:", data.error || "No image URL returned");
+          return resolve({ src: '', source: 'none' });
         }
 
         return resolve({ src: data.imageUrl, source: 'chatgpt' });
 
       } catch (err) {
-        console.error("Fallback image fetch failed:", err);
+        console.error("🔥 Exception during fallback:", err);
         return resolve({ src: '', source: 'none' });
       }
     };
@@ -94,4 +94,3 @@ async function getImagePath(refFormatted) {
 
 // ✅ Expose function to HTML onclick
 window.lookupReference = lookupReference;
-
