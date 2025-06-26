@@ -1,0 +1,31 @@
+// File: /netlify/functions/getImageBackup.js
+
+const { OpenAI } = require("openai");
+
+exports.handler = async (event) => {
+  try {
+    const { reference } = JSON.parse(event.body);
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const response = await openai.images.generate({
+      prompt: `Patek Philippe watch with reference number ${reference}, realistic product photo, luxury watch on white background`,
+      n: 1,
+      size: "512x512",
+      response_format: "url"
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ imageUrl: response.data[0].url }),
+    };
+  } catch (err) {
+    console.error("Image generation error:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }),
+    };
+  }
+};
