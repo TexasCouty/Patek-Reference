@@ -1,72 +1,64 @@
-const fetch = require("node-fetch");
-
-// Helper to query a specific question from GPT
-async function queryOpenAI(question) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are a highly accurate watch expert. Provide reliable, sourced, and verified specifications for each component."
-        },
-        {
-          role: "user",
-          content: question
-        }
-      ],
-      temperature: 0.3
-    })
-  });
-
-  const data = await response.json();
-  console.log("🔍 GPT Answer:", data);
-  return data.choices?.[0]?.message?.content?.trim() || "";
-}
+const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
   console.log("⚡️ Function triggered");
 
   try {
+    console.log("📝 Raw event body:", event.body);
     const { reference } = JSON.parse(event.body);
-    console.log("📦 Reference received:", reference);
+    console.log("🔍 Parsed reference:", reference);
 
-    // Ask each field separately for better accuracy
-    const retail_price = await queryOpenAI(`What is the retail price of the Patek Philippe watch with reference number ${reference}? Provide only the price.`);
-    const collection = await queryOpenAI(`Which collection does the Patek Philippe watch with reference number ${reference} belong to? Give just the name of the collection.`);
-    const dial = await queryOpenAI(`What is the dial like on the Patek Philippe watch with reference number ${reference}?`);
-    const dial_color = await queryOpenAI(`What is the color of the dial on the Patek Philippe watch with reference number ${reference}? Just give the color.`);
-    const caseDesc = await queryOpenAI(`What is the case material and size of the Patek Philippe watch with reference number ${reference}?`);
-    const bracelet = await queryOpenAI(`Describe the bracelet or strap of the Patek Philippe watch with reference number ${reference}.`);
-    const movement = await queryOpenAI(`What is the movement used in the Patek Philippe watch with reference number ${reference}? Provide the caliber name and type.`);
+    const prompt = `Provide ONLY raw JSON (no markdown) with these fields for Patek Philippe reference number ${reference}:
+{
+  "reference": "",
+  "retail_price": "",
+  "collection": "",
+  "dial": "",
+  "case": "",
+  "bracelet": "",
+  "movement": ""
+}`;
 
-    const result = {
-      reference,
-      retail_price,
-      collection,
-      dial,
-      dial_color,
-      case: caseDesc,
-      bracelet,
-      movement
-    };
+    console.log("📤 Prompt to OpenAI:", prompt);
 
-    console.log("✅ Final result:", result);
+    const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.2
+      })
+    });
+
+    const data = await openaiResponse.json();
+    console.log("🤖 OpenAI raw response:", JSON.stringify(data, null, 2));
+
+    if (!data.choices || !data.choices[0]?.message?.content) {
+      console.warn("⚠️ OpenAI returned no choices or content.");
+      throw new Error("Invalid response from OpenAI.");
+    }
+
+    const jsonOutput = JSON.parse(data.choices[0].message.content);
+    console.log("✅ Parsed JSON output:", jsonOutput);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(result)
+      body: JSON.stringify(jsonOutput)
     };
+
   } catch (err) {
-    console.error("❌ Error:", err);
+    console.error("❌ Function error:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message })
     };
   }
 };
+
