@@ -4,7 +4,6 @@ exports.handler = async (event) => {
   console.log("📥 Incoming request to getImageBackup");
 
   try {
-    // Check for empty or invalid body
     if (!event.body) {
       console.error("❌ Missing request body");
       return {
@@ -29,42 +28,42 @@ exports.handler = async (event) => {
     });
 
     if (!process.env.OPENAI_API_KEY) {
-      console.error("❌ OPENAI_API_KEY is not defined in environment variables");
+      console.error("❌ OPENAI_API_KEY is not defined");
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Server misconfiguration: missing API key" }),
+        body: JSON.stringify({ error: "Missing OpenAI API key" }),
       };
     }
 
-    console.log("🚀 Requesting image from OpenAI for:", reference);
+    console.log("🚀 Sending image generation request to OpenAI");
 
     const response = await openai.images.generate({
-      prompt: `Patek Philippe watch with reference number ${reference}, professional product photo, white background`,
+      prompt: `Patek Philippe watch with reference number ${reference}, product photo on white background`,
       n: 1,
       size: "512x512",
       response_format: "url"
     });
 
-    console.log("✅ OpenAI image response received");
+    console.log("📦 OpenAI response received:", response);
 
     const imageUrl = response?.data?.[0]?.url;
 
-    if (!imageUrl) {
-      console.error("❌ OpenAI did not return a valid image URL");
+    if (!imageUrl || typeof imageUrl !== 'string') {
+      console.error("❌ Invalid response from OpenAI.");
       return {
         statusCode: 502,
-        body: JSON.stringify({ error: "Image generation failed" }),
+        body: JSON.stringify({ error: "Invalid response from OpenAI." }),
       };
     }
 
-    console.log("✅ Generated image URL:", imageUrl);
+    console.log("✅ Returning image URL:", imageUrl);
 
     return {
       statusCode: 200,
       body: JSON.stringify({ imageUrl }),
     };
   } catch (err) {
-    console.error("🔥 Unhandled error in getImageBackup:", err.message || err);
+    console.error("🔥 Error during image fallback:", err.message || err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message || "Unknown error occurred" }),
